@@ -256,6 +256,8 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
     name_nm: [],
     stan_cd: "",
     stan_nm: "",
+    cust_cd: "",
+    cust_nm: "",
     thick_f: "",
     thick_t: "",
     width_f: "",
@@ -273,6 +275,7 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
     sort,
     name_nm,
     stan_nm,
+    cust_nm,
     thick_f,
     thick_t,
     width_f,
@@ -284,7 +287,6 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
   const list = JSON.parse(window.sessionStorage.getItem("program_list"));
 
   const [codeKind, setCodeKind] = React.useState("");
-  const [codeListData, setCodeListData] = React.useState([]);
   const [codeListDataOnlySelect, setCodeListDataOnlySelect] = React.useState(
     []
   );
@@ -366,15 +368,11 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
   };
 
   const handleClickOpen = (code_kind) => {
-    // if (code_kind === "stan_cd") {
-    //   setCodeListData(
-    //     JSON.parse(window.sessionStorage.getItem("stan_cd_list"))
-    //   );
-    // } else if (code_kind === "cust_cd") {
-    //   setCodeListData(
-    //     JSON.parse(window.sessionStorage.getItem("cust_cd_list"))
-    //   );
-    // }
+    if (code_kind === "stan_cd") {
+     setCodeKind(code_kind)
+    } else if (code_kind === "cust_cd") {
+     setCodeKind(code_kind)
+    }
     setOpenDialog(true);
   };
 
@@ -425,8 +423,11 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
     }
 
     if (codeName !== "exit")
-      if (codeKind === "name_cd") {
-        setInputs({ ...inputs, name_cd: codeCd, name_nm: codeName });
+      if (codeKind === "stan_cd") {
+        setInputs({ ...inputs, stan_cd: codeCd, stan_nm: codeName });
+      }
+      else if (codeKind === "cust_cd") {
+        setInputs({ ...inputs, cust_cd: codeCd, cust_nm: codeName });
       }
 
     setOpenDialog(false);
@@ -518,7 +519,7 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
       form.append("login_id", window.sessionStorage.getItem("user_id"));
       form.append("token", token);
       axios
-        .post("http://192.168.0.137/m_api/index.php/login/logout", form)
+        .post("http://192.168.35.147/m_api/index.php/login/logout", form)
         .then(() => {
           history.replace({
             pathname: "/",
@@ -747,26 +748,23 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
                 </td>
                 <td>
                   <CssTextField
-                    placeholder="선택"
+                    placeholder="입력 or 찾기"
                     name="stan_nm"
                     fullWidth
                     size="small"
                     onChange={handleOnChange}
-                    onClick={() => handleClickOpen("stan_cd")}
                     value={stan_nm}
                     variant="outlined"
-                    InputProps={{
-                      readOnly: true,
-                    }}
+                   
                   />
-                  {stan_nm.length > 0 && (
+                  {
                     <IconButton
                       className={classes.clearIcon}
-                      onClick={() => handleClearIcon("stan_cd")}
+                      onClick={() => handleClickOpen("stan_cd")}
                     >
-                      <ClearIcon fontSize="small" />
+                      <SearchIcon fontSize="small" />
                     </IconButton>
-                  )}
+                  }
                 </td>
               </tr>
             </tbody>
@@ -777,27 +775,24 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
                 </td>
                 <td>
                   <CssTextField
-                    name="name_nm"
-                    placeholder="선택"
+                    name="cust_nm"
+                    placeholder="입력 or 찾기"
                     fullWidth
                     size="small"
                     onChange={handleOnChange}
-                    onClick={() => handleClickOpen("cust_cd")}
-                    className={classes.textField}
-                    value={name_nm}
+                   className={classes.textField}
+                    value={cust_nm}
                     variant="outlined"
-                    InputProps={{
-                      readOnly: true,
-                    }}
+                    
                   />
-                  {name_nm.length > 0 && (
+                  {
                     <IconButton
                       className={classes.clearIcon}
-                      onClick={() => handleClearIcon("cust_cd")}
+                      onClick={() => handleClickOpen("cust_cd")}
                     >
-                      <ClearIcon fontSize="small" />
+                      <SearchIcon fontSize="small" />
                     </IconButton>
-                  )}
+                  }
                 </td>
               </tr>
             </tbody>
@@ -974,14 +969,24 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
               variant="contained"
               onClick={() => {
                 setInputs({
-                  buy_cust_cd: "",
-                  buy_cust_name: "",
-                  group_cd: "",
-                  group_name: "",
-                  class_cd: "",
-                  class_name: "",
-                  product_cd: "",
-                  product_name: "",
+                  im_cls: "",
+                  im_cls_nm: "",
+                  name_cd: [],
+                  name_nm: [],
+                  stan_cd: "",
+                  stan_nm: "",
+                  cust_cd: "",
+                  cust_nm: "",
+                  thick_f: "",
+                  thick_t: "",
+                  width_f: "",
+                  width_t: "",
+                  work_cust_cd: "",
+                  work_cust_nm: "",
+                  stock_cust_cls: "",
+                  stock_cust_cls_nm: "",
+                  search_type_cls: "",
+                  search_type_cls_nm: "",
                 });
               }}
             >
@@ -1000,7 +1005,7 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
             </Button>
           </div>
         </Container>
-        <CustomDialogSearch open={openDialog} onClose={handleClose} />
+        <CustomDialogSearch codeKind={codeKind} open={openDialog} onClose={handleClose} />
 
         <CustomDialogOnlySelect
           data={codeListDataOnlySelect}
