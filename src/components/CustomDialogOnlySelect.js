@@ -63,10 +63,9 @@ function CustomDialogOnlySelect(props) {
         <DialogContent>
           <div>
             {data.map((listData) => (
-              <>
+              <div key={listData.CODE_CD}>
                 <ListItem
                   className={classes.listItem}
-                  key={listData.CODE_CD}
                   button
                   onClick={() =>
                     handleListItemClick(listData.CODE_NAME, listData.CODE_CD)
@@ -75,7 +74,7 @@ function CustomDialogOnlySelect(props) {
                   <ListItemText primary={listData.CODE_NAME} />
                 </ListItem>
                 <Divider />
-              </>
+              </div>
             ))}
           </div>
         </DialogContent>

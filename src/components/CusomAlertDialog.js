@@ -8,7 +8,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import { Typography } from "@material-ui/core";
 
 export default function CustomAlertDialog(props) {
-  const { open, handleClickAgree, handleClickDisagree, title, content } = props;
+  const { open, handleClickAgree, handleClickDisagree, content } = props;
 
   const handleClickOpen = () => {
     handleClickAgree();

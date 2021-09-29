@@ -112,7 +112,7 @@ function AppBars({ history, programName }) {
       form.append("login_id", window.sessionStorage.getItem("user_id"));
       form.append("token", token);
       axios
-        .post("http://192.168.35.147/m_api/index.php/login/logout", form)
+        .post("http://192.168.0.137/m_api/index.php/login/logout", form)
         .then(() => {
           history.replace({
             pathname: "/",

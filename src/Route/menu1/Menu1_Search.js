@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import Container from "@material-ui/core/Container";
 import TextField from "@material-ui/core/TextField";
@@ -7,7 +7,6 @@ import Button from "@material-ui/core/Button";
 import CustomDialogSearch from "../../components/CustomDialogSearch";
 import IconButton from "@material-ui/core/IconButton";
 import ClearIcon from "@material-ui/icons/Clear";
-import Menu from "@material-ui/core/Menu";
 import { withStyles } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
@@ -25,11 +24,6 @@ import Drawer from "@material-ui/core/Drawer";
 import CloseIcon from "@material-ui/icons/Close";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import CustomAlertDialog from "../../components/CusomAlertDialog";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormControl from "@material-ui/core/FormControl";
-import SortIcon from "@material-ui/icons/Sort";
 import CustomDialogOnlySelect from "../../components/CustomDialogOnlySelect";
 import CustomDialogMultiSelect from "../../components/CustomDialogMultiSelect";
 
@@ -212,9 +206,9 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
         count = count + 1;
       }
       if (openDialog) {
-        setOpenDialog(false);
-        console.log("dialog");
-        count = count + 1;
+        //   setOpenDialog(false);
+        //   console.log("dialog");
+        //    count = count + 1;
       }
       if (openAlertDialog) {
         setOpenAlertDialog(false);
@@ -249,9 +243,8 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
   }
 
   const [inputs, setInputs] = useState({
-    sort: "default_asc",
-    im_cls: "",
-    im_cls_nm: "",
+    im_cls: "1",
+    im_cls_nm: "자사",
     name_cd: [],
     name_nm: [],
     stan_cd: "",
@@ -264,15 +257,14 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
     width_t: "",
     work_cust_cd: "",
     work_cust_nm: "",
-    stock_cust_cls: "",
-    stock_cust_cls_nm: "",
+    stock_cls: "0",
+    stock_cls_nm: "가용재고",
     search_type_cls: "",
     search_type_cls_nm: "",
   });
 
   const {
     im_cls_nm,
-    sort,
     name_nm,
     stan_nm,
     cust_nm,
@@ -281,7 +273,7 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
     width_f,
     width_t,
     work_cust_nm,
-    stock_cust_cls_nm,
+    stock_cls_nm,
     search_type_cls_nm,
   } = inputs;
   const list = JSON.parse(window.sessionStorage.getItem("program_list"));
@@ -298,12 +290,6 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
   const [openDialogMultiSelect, setOpenDialogMultiSelect] = useState(false);
   const [openAlertDialog, setOpenAlertDialog] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const criteria_sort = [
-    "매입일 (오래된순)",
-    "매입일 (최신순)",
-    "매입처명 (오름차순)",
-    "매입처명 (내림차순)",
-  ];
 
   const handleOnChange = (e) => {
     const { value, name } = e.target;
@@ -311,20 +297,6 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
       ...inputs,
       [name]: value,
     });
-  };
-
-  const handleClickSortIcon = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseSortIcon = () => {
-    setAnchorEl(null);
-  };
-
-  const handleSortChange = (e) => {
-    inputs.sort = e.target.value;
-    if (window.sessionStorage.getItem("pr0301r_itemList") != null)
-      setLoadItem(inputs, true);
   };
 
   const handleClearIcon = (code_kind) => {
@@ -352,11 +324,11 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
         work_cust_cd: "",
         work_cust_nm: "",
       });
-    } else if (code_kind === "stock_cust_cls") {
+    } else if (code_kind === "stock_cls") {
       setInputs({
         ...inputs,
-        stock_cust_cls: "",
-        stock_cust_cls_nm: "",
+        stock_cls: "",
+        stock_cls_nm: "",
       });
     } else if (code_kind === "search_type_cls") {
       setInputs({
@@ -369,9 +341,9 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
 
   const handleClickOpen = (code_kind) => {
     if (code_kind === "stan_cd") {
-     setCodeKind(code_kind)
+      setCodeKind(code_kind);
     } else if (code_kind === "cust_cd") {
-     setCodeKind(code_kind)
+      setCodeKind(code_kind);
     }
     setOpenDialog(true);
   };
@@ -390,10 +362,10 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
     } else if (code_kind === "work_cust_cd") {
       setCodeListDataOnlySelect([
         { CODE_CD: 0, CODE_NAME: "전체" },
-        { CODE_CD: 1, CODE_NAME: "(주)에스에이" },
-        { CODE_CD: 2, CODE_NAME: "영진철강(주)" },
+        { CODE_CD: "ES014", CODE_NAME: "(주)에스에이" },
+        { CODE_CD: "YJ004", CODE_NAME: "영진철강(주)" },
       ]);
-    } else if (code_kind === "stock_cust_cls") {
+    } else if (code_kind === "stock_cls") {
       setCodeListDataOnlySelect([
         { CODE_CD: 0, CODE_NAME: "가용재고" },
         { CODE_CD: 1, CODE_NAME: "전체재고" },
@@ -425,8 +397,7 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
     if (codeName !== "exit")
       if (codeKind === "stan_cd") {
         setInputs({ ...inputs, stan_cd: codeCd, stan_nm: codeName });
-      }
-      else if (codeKind === "cust_cd") {
+      } else if (codeKind === "cust_cd") {
         setInputs({ ...inputs, cust_cd: codeCd, cust_nm: codeName });
       }
 
@@ -444,11 +415,11 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
         setInputs({ ...inputs, im_cls: codeCd, im_cls_nm: codeName });
       } else if (codeKind === "work_cust_cd") {
         setInputs({ ...inputs, work_cust_cd: codeCd, work_cust_nm: codeName });
-      } else if (codeKind === "stock_cust_cls") {
+      } else if (codeKind === "stock_cls") {
         setInputs({
           ...inputs,
-          stock_cust_cls: codeCd,
-          stock_cust_cls_nm: codeName,
+          stock_cls: codeCd,
+          stock_cls_nm: codeName,
         });
       } else if (codeKind === "search_type_cls") {
         setInputs({
@@ -519,7 +490,7 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
       form.append("login_id", window.sessionStorage.getItem("user_id"));
       form.append("token", token);
       axios
-        .post("http://192.168.35.147/m_api/index.php/login/logout", form)
+        .post("http://192.168.0.137/m_api/index.php/login/logout", form)
         .then(() => {
           history.replace({
             pathname: "/",
@@ -550,57 +521,6 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
 
           <div className={classes.grow} />
 
-          <IconButton
-            className={classes.sortIcon}
-            onClick={handleClickSortIcon}
-          >
-            <SortIcon />
-          </IconButton>
-
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleCloseSortIcon}
-          >
-            <FormControl component="fieldset">
-              <RadioGroup name="sort" value={sort} onChange={handleSortChange}>
-                <>
-                  <MenuItem onClick={handleCloseSortIcon}>
-                    <FormControlLabel
-                      value="default_asc"
-                      name="sort"
-                      control={<Radio />}
-                      label={criteria_sort[0]}
-                    />
-                  </MenuItem>
-                  <MenuItem onClick={handleCloseSortIcon}>
-                    <FormControlLabel
-                      value="default_desc"
-                      name="sort"
-                      control={<Radio />}
-                      label={criteria_sort[1]}
-                    />
-                  </MenuItem>
-                  <MenuItem onClick={handleCloseSortIcon}>
-                    <FormControlLabel
-                      value="amount_asc"
-                      name="sort"
-                      control={<Radio />}
-                      label={"매입금액 (낮은순)"}
-                    />
-                  </MenuItem>
-                  <MenuItem onClick={handleCloseSortIcon}>
-                    <FormControlLabel
-                      value="amount_desc"
-                      name="sort"
-                      control={<Radio />}
-                      label={"매입금액 (높은순)"}
-                    />
-                  </MenuItem>
-                </>
-              </RadioGroup>
-            </FormControl>
-          </Menu>
           <SearchIcon onClick={() => setOpenSearch(!openSearch)} />
           <ClearIcon
             className={classes.exitButton}
@@ -755,7 +675,6 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
                     onChange={handleOnChange}
                     value={stan_nm}
                     variant="outlined"
-                   
                   />
                   {
                     <IconButton
@@ -780,10 +699,9 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
                     fullWidth
                     size="small"
                     onChange={handleOnChange}
-                   className={classes.textField}
+                    className={classes.textField}
                     value={cust_nm}
                     variant="outlined"
-                    
                   />
                   {
                     <IconButton
@@ -906,23 +824,23 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
                 </td>
                 <td align="center">
                   <CssTextField
-                    name="stock_cust_cls_nm"
+                    name="stock_cls_nm"
                     placeholder="선택"
                     fullWidth
                     size="small"
                     onChange={handleOnChange}
-                    onClick={() => handleClickOpenOnlySelect("stock_cust_cls")}
+                    onClick={() => handleClickOpenOnlySelect("stock_cls")}
                     className={classes.textField}
-                    value={stock_cust_cls_nm}
+                    value={stock_cls_nm}
                     variant="outlined"
                     InputProps={{
                       readOnly: true,
                     }}
                   />
-                  {stock_cust_cls_nm.length > 0 && (
+                  {stock_cls_nm.length > 0 && (
                     <IconButton
                       className={classes.clearIcon}
-                      onClick={() => handleClearIcon("stock_cust_cls")}
+                      onClick={() => handleClearIcon("stock_cls")}
                     >
                       <ClearIcon fontSize="small" />
                     </IconButton>
@@ -969,8 +887,8 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
               variant="contained"
               onClick={() => {
                 setInputs({
-                  im_cls: "",
-                  im_cls_nm: "",
+                  im_cls: "1",
+                  im_cls_nm: "자사",
                   name_cd: [],
                   name_nm: [],
                   stan_cd: "",
@@ -983,8 +901,8 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
                   width_t: "",
                   work_cust_cd: "",
                   work_cust_nm: "",
-                  stock_cust_cls: "",
-                  stock_cust_cls_nm: "",
+                  stock_cls: "0",
+                  stock_cls_nm: "가용재고",
                   search_type_cls: "",
                   search_type_cls_nm: "",
                 });
@@ -1005,7 +923,11 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
             </Button>
           </div>
         </Container>
-        <CustomDialogSearch codeKind={codeKind} open={openDialog} onClose={handleClose} />
+        <CustomDialogSearch
+          codeKind={codeKind}
+          open={openDialog}
+          onClose={handleClose}
+        />
 
         <CustomDialogOnlySelect
           data={codeListDataOnlySelect}

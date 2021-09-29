@@ -2,66 +2,50 @@ import React, { PureComponent } from "react";
 import axios from "axios";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { withStyles } from "@material-ui/core/styles";
-import MuiAccordion from "@material-ui/core/Accordion";
-import MuiAccordionSummary from "@material-ui/core/AccordionSummary";
-import MuiAccordionDetails from "@material-ui/core/AccordionDetails";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import Divider from "@material-ui/core/Divider";
 import SearchBar from "./Menu1_Search";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
+import List from "@mui/material/List";
+import Collapse from "@mui/material/Collapse";
+import ListItemText from "@mui/material/ListItemText";
+import TreeView from "@mui/lab/TreeView";
+import TreeItem from "@mui/lab/TreeItem";
+import ListItem from "@mui/material/ListItem";
 
-const Accordion = withStyles({
+const StyledListItem = withStyles({
   root: {
-    border: "1px solid rgba(0, 0, 0, .4)",
-    boxShadow: "none",
-    "&:not(:last-child)": {
-      borderBottom: 0,
-    },
-    "&:before": {
-      display: "none",
-    },
-    "&$expanded": {
-      margin: "auto",
-    },
+    width: "100vw",
+    marginLeft: "-3px",
+    padding: 0,
+    margin: 0,
+    background: "gray",
   },
-  expanded: {},
-})(MuiAccordion);
+})(ListItemText);
 
-const AccordionSummary = withStyles({
+const CustomTreeItem = withStyles({
   root: {
-    backgroundColor: "rgba(214, 223, 236, 1)",
-    borderBottom: "1px solid rgba(0, 0, 0, .4)",
-    marginBottom: -1,
-    height: 56,
-    "&$expanded": {
-      minHeight: "100%",
-    },
+    backgroundColor: "white",
   },
-  expandIcon: {
-    padding: "0vh 1vw",
+  "&.Mui-focused, &.Mui-selected, &.Mui-selected.Mui-focused": {
+    backgroundColor: "blue",
+    color: "var(--tree-view-color)",
   },
-  expanded: {},
-})(MuiAccordionSummary);
-
-const AccordionDetails = withStyles({
-  root: {
-    padding: "1vh 2vw",
-  },
-})(MuiAccordionDetails);
+})(TreeItem);
 
 const useStyles = (theme) => ({
   root: {
     width: "98vw",
     marginLeft: "1vw",
     marginTop: "97px",
-    marginBottom: "38px",
+    marginBottom: "310px",
   },
 
   container: {
     marginTop: "5px",
     marginBottom: "5px",
   },
+
+  tree: {},
 
   header: {
     position: "fixed",
@@ -197,6 +181,23 @@ const useStyles = (theme) => ({
     backgroundColor: "transparent",
   },
 
+  typoLeft_header: {
+    color: "#FFFFFF",
+    padding: "5px 0",
+    margin: 0,
+    paddingRight: "20px",
+    textAlign: "center",
+    backgroundColor: "transparent",
+  },
+
+  typoRight_header: {
+    color: "#FFFFFF",
+    padding: "5px 0",
+    margin: 0,
+    textAlign: "center",
+    backgroundColor: "transparent",
+  },
+
   typo_footer: {
     padding: "5px 0",
     paddingRight: "20px",
@@ -206,27 +207,10 @@ const useStyles = (theme) => ({
     backgroundColor: "transparent",
   },
 
-  typoLeft_header: {
-    color: "#FFFFFF",
-    padding: "5px 0",
-    margin: 0,
-    textAlign: "center",
-    backgroundColor: "transparent",
-  },
-
   typoLeft_footer: {
     color: "#000000",
     padding: "5px 0",
     margin: 0,
-    textAlign: "center",
-    backgroundColor: "transparent",
-  },
-
-  typoRight_header: {
-    color: "#FFFFFF",
-    padding: "5px 0",
-    margin: 0,
-    paddingRight: "0px",
     textAlign: "center",
     backgroundColor: "transparent",
   },
@@ -250,22 +234,51 @@ const nullCheck = (text) => {
   else return text;
 };
 
+const renderList = (index, data, length) => {
+  // console.log(index);
+  // console.log(data.DATA);
+  let i = index;
+  let result = [];
+  for (i; i < length && data.DATA[i].SORT_VAL !== "1"; i++) {
+    //console.log("tete");
+    //console.log(data.DATA[i].SORT_VAL);
+    result.push(<ListItem>{data.DATA[i].WORK_CUST_NM}</ListItem>);
+  }
+  return result;
+};
+
+let collapseItemList = [];
+let Length = 0;
+
 class Menu1 extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      criteria: "",
       loading: false,
       itemList: [],
-      openSearchToggle:
-        window.sessionStorage.getItem("pr0301r_itemList") === null
-          ? true
-          : false,
-      mainAccordionExpand: [],
-      subAccordionExpand: [],
+      expandList: [],
+      test: false,
+      // openSearchToggle:
+      //   window.sessionStorage.getItem("pr0301r_itemList") === null
+      //     ? true
+      //     : false,
+      // mainAccordionExpand: [],
+      // subAccordionExpand: [],
     };
     window.sessionStorage.setItem("scrollSaveFlag", 2);
   }
+
+  handleExpandList = (index) => {
+    console.log(this.state.expandList);
+    if (this.state.expandList.includes(index)) {
+      this.state.expandList = this.state.expandList.filter(
+        (element) => element !== index
+      );
+    } else {
+      this.state.expandList = this.state.expandList.concat(index);
+    }
+    this.setState({ test: !this.state.test });
+  };
 
   handleExpandMainAccordion = (panel) => (event, newExpanded) => {
     if (newExpanded) {
@@ -290,179 +303,107 @@ class Menu1 extends PureComponent {
   };
 
   componentDidMount() {
-    if (window.sessionStorage.getItem("pr0301r_itemList") !== null) {
-      if (
-        window.sessionStorage.getItem("pr0301r_mainAccordionExpand") !== null
-      ) {
-        this.setState({
-          mainAccordionExpand: JSON.parse(
-            window.sessionStorage.getItem("pr0301r_mainAccordionExpand")
-          ),
-          subAccordionExpand: JSON.parse(
-            window.sessionStorage.getItem("pr0301r_subAccordionExpand")
-          ),
-        });
-      }
-      setTimeout(() => {
-        this.setState({
-          criteria: JSON.parse(window.sessionStorage.getItem("pr0301r_search"))
-            .criteria,
-          itemList: JSON.parse(
-            window.sessionStorage.getItem("pr0301r_itemList")
-          ),
-        });
-      }, 1000);
-    }
+    // if (window.sessionStorage.getItem("pr0301r_itemList") !== null) {
+    //   if (
+    //     window.sessionStorage.getItem("pr0301r_mainAccordionExpand") !== null
+    //   ) {
+    //     this.setState({
+    //       mainAccordionExpand: JSON.parse(
+    //         window.sessionStorage.getItem("pr0301r_mainAccordionExpand")
+    //       ),
+    //       subAccordionExpand: JSON.parse(
+    //         window.sessionStorage.getItem("pr0301r_subAccordionExpand")
+    //       ),
+    //     });
+    //   }
+    // setTimeout(() => {
+    //   this.setState({
+    //     criteria: JSON.parse(window.sessionStorage.getItem("pr0301r_search"))
+    //       .criteria,
+    //     itemList: JSON.parse(
+    //       window.sessionStorage.getItem("pr0301r_itemList")
+    //     ),
+    //   });
+    // }, 1000);
   }
 
   componentDidUpdate() {
     if (window.sessionStorage.getItem("scrollSaveFlag") !== null) {
-      window.scrollTo(0, window.sessionStorage.getItem("pr0301r_scroll"));
+      window.scrollTo(0, window.sessionStorage.getItem("Menu1_scroll"));
       window.sessionStorage.removeItem("scrollSaveFlag");
     }
   }
 
   componentWillUnmount() {
-    if (window.sessionStorage.getItem("pr0301r_itemList") !== null) {
-      window.sessionStorage.setItem("pr0301r_scroll", window.pageYOffset);
-      window.sessionStorage.setItem(
-        "pr0301r_mainAccordionExpand",
-        JSON.stringify(this.state.mainAccordionExpand)
-      );
-      window.sessionStorage.setItem(
-        "pr0301r_subAccordionExpand",
-        JSON.stringify(this.state.subAccordionExpand)
-      );
-    } else {
-      window.sessionStorage.removeItem("pr0301r_scroll");
-      window.sessionStorage.removeItem("pr0301r_mainAccordionExpand");
-      window.sessionStorage.removeItem("pr0301r_subAccordionExpand");
-    }
+    // if (window.sessionStorage.getItem("pr0301r_itemList") !== null) {
+    //   window.sessionStorage.setItem("pr0301r_scroll", window.pageYOffset);
+    //   window.sessionStorage.setItem(
+    //     "pr0301r_mainAccordionExpand",
+    //     JSON.stringify(this.state.mainAccordionExpand)
+    //   );
+    //   window.sessionStorage.setItem(
+    //     "pr0301r_subAccordionExpand",
+    //     JSON.stringify(this.state.subAccordionExpand)
+    //   );
+    // } else {
+    //   window.sessionStorage.removeItem("pr0301r_scroll");
+    //   window.sessionStorage.removeItem("pr0301r_mainAccordionExpand");
+    //   window.sessionStorage.removeItem("pr0301r_subAccordionExpand");
+    // }
   }
 
-  loadItem = async (data, isSort) => {
-    if (isSort) {
-      let itemList = JSON.parse(
-        window.sessionStorage.getItem("pr0301r_itemList")
-      );
-      if (data.criteria === "date") {
-        if (data.sort === "default_asc") {
-          itemList.DATA.sort(function (a, b) {
-            return a.BUY_DATE < b.BUY_DATE
-              ? -1
-              : a.BUY_DATE > b.BUY_DATE
-              ? 1
-              : 0;
-          });
-        } else if (data.sort === "default_desc") {
-          itemList.DATA.sort(function (a, b) {
-            return a.BUY_DATE > b.BUY_DATE
-              ? -1
-              : a.BUY_DATE < b.BUY_DATE
-              ? 1
-              : 0;
-          });
-        }
-      } else if (data.criteria === "cust") {
-        if (data.sort === "default_asc") {
-          itemList.DATA.sort(function (a, b) {
-            return a.BUY_CUST_NAME < b.BUY_CUST_NAME
-              ? -1
-              : a.BUY_CUST_NAME > b.BUY_CUST_NAME
-              ? 1
-              : 0;
-          });
-        } else if (data.sort === "default_desc") {
-          itemList.DATA.sort(function (a, b) {
-            return a.BUY_CUST_NAME > b.BUY_CUST_NAME
-              ? -1
-              : a.BUY_CUST_NAME < b.BUY_CUST_NAME
-              ? 1
-              : 0;
-          });
-        }
-      }
-      if (data.sort === "amount_asc") {
-        itemList.DATA.sort(function (a, b) {
-          return parseInt(a.TOT_AMOUNT) < parseInt(b.TOT_AMOUNT)
-            ? -1
-            : parseInt(a.TOT_AMOUNT) > parseInt(b.TOT_AMOUNT)
-            ? 1
-            : 0;
-        });
-      } else if (data.sort === "amount_desc") {
-        itemList.DATA.sort(function (a, b) {
-          return parseInt(a.TOT_AMOUNT) > parseInt(b.TOT_AMOUNT)
-            ? -1
-            : parseInt(a.TOT_AMOUNT) < parseInt(b.TOT_AMOUNT)
-            ? 1
-            : 0;
-        });
-      }
-      this.setState({
-        itemList: itemList,
-        mainAccordionExpand: [],
-        subAccordionExpand: [],
-      });
-    } else {
-      this.setState({
-        criteria: data.criteria,
-        loading: true,
-        mainAccordionExpand: [],
-        subAccordionExpand: [],
-      });
+  loadItem = async (data) => {
+    console.log(data);
+    this.setState({
+      loading: true,
+    });
 
-      axios
-        .get(
-          "http://121.165.242.72:5050/retail/developer/index.php/retailPurchase_pr0301r/retrieve",
-          {
-            params: {
-              criteria: data.criteria,
-              date_f:
-                data.date_f !== null ? data.date_f.replaceAll("/", "") : "",
-              date_t:
-                data.date_t !== null ? data.date_t.replaceAll("/", "") : "",
-              branch_cd: window.sessionStorage.getItem("branch_cd"),
-              buy_cust_cd: data.buy_cust_cd,
-              group_cd: data.group_cd,
-              class_cd: data.class_cd,
-              product_cd: data.product_cd,
-              sort: data.sort,
-            },
-          }
-        )
-        .then((response) => {
-          console.log("response data receving");
-          if (response.data.RESULT_CODE === "200") {
-            // data라는 이름으로 json 파일에 있는 값에 state값을 바꿔준다.
-            window.sessionStorage.setItem(
-              "pr0301r_itemList",
-              JSON.stringify(response.data)
-            );
-            this.setState({
-              loading: false, // load되었으니 false,
-              itemList: response.data, // 비어있던 Itemlist는 data에 Item객체를 찾아넣어준다. (Item : json파일에 있는 항목)
-              openSearchToggle: false,
-            });
-          } else {
-            alert(
-              "조회된 내역이 없습니다.",
-              window.sessionStorage.removeItem("pr0301r_itemList"),
-              this.setState({
-                loading: false,
-                itemList: "",
-                openSearchToggle: true,
-              })
-            );
-          }
-        })
-        .catch((e) => {
-          console.error(e); // 에러표시
+    axios
+      .get("http://192.168.0.137/m_api/index.php/Menu1/retrieve", {
+        params: {
+          im_cls: data.im_cls,
+          name_cd: data.name_cd,
+          name_nm: data.name_nm,
+          stan_cd: data.stan_cd,
+          stan_nm: data.stan_nm,
+          work_cust_cd: data.work_cust_cd,
+          work_cust_nm: data.work_cust_nm,
+          thick_f: data.thick_f,
+          thick_t: data.thick_t,
+          width_f: data.width_f,
+          width_t: data.width_t,
+          sell_cust_cd: data.sell_cust_cd,
+          sell_cust_nm: data.sell_cust_nm,
+          stock_cls: data.stock_cls,
+        },
+      })
+      .then((response) => {
+        console.log("response data receiving");
+        console.log(response);
+        if (response.data.RESULT_CODE === "200") {
+          // data라는 이름으로 json 파일에 있는 값에 state값을 바꿔준다.
           this.setState({
-            loading: false, // 이때는 load 가 false 유지
+            loading: false, // load되었으니 false,
+            itemList: response.data, // 비어있던 Itemlist는 data에 Item객체를 찾아넣어준다. (Item : json파일에 있는 항목)
+            openSearchToggle: false,
           });
+        } else {
+          alert(
+            "조회된 내역이 없습니다.",
+            this.setState({
+              loading: false,
+              itemList: "",
+              openSearchToggle: true,
+            })
+          );
+        }
+      })
+      .catch((e) => {
+        console.error(e); // 에러표시
+        this.setState({
+          loading: false, // 이때는 load 가 false 유지
         });
-    }
+      });
   };
 
   render() {
@@ -476,14 +417,6 @@ class Menu1 extends PureComponent {
               <CircularProgress disableShrink color="secondary" size={60} />
             </div>
           </div>
-        ) : window.sessionStorage.getItem("pr0301r_itemList") !== null &&
-          this.state.criteria === "" ? (
-          <div>
-            <SearchBar programName={"소재재고현황"} />
-            <div className={classes.circular_progress}>
-              <CircularProgress disableShrink color="secondary" size={60} />
-            </div>
-          </div>
         ) : (
           <div className={classes.root}>
             <SearchBar
@@ -491,12 +424,17 @@ class Menu1 extends PureComponent {
               parentState={this.loadItem}
               openSearchToggle={this.state.openSearchToggle}
             />
-            {this.state.itemList.SUM_AMOUNT !== undefined && (
+            <div>
               <div className={classes.header}>
                 <Grid className={classes.container} container>
-                  <Grid item xs={6} sm={6}>
+                  <Grid item xs={4} sm={4}>
                     <Paper elevation={0} className={classes.typo_header}>
-                      {this.state.criteria === "date" ? "매입일" : "매입처"}
+                      {"품명"}
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={4} sm={4}>
+                    <Paper elevation={0} className={classes.typo_header}>
+                      {"사이즈"}
                     </Paper>
                   </Grid>
                   <Grid item xs={2} sm={2}>
@@ -504,457 +442,115 @@ class Menu1 extends PureComponent {
                       {"수량"}
                     </Paper>
                   </Grid>
-                  <Grid item xs={4} sm={4}>
+                  <Grid item xs={2} sm={2}>
                     <Paper elevation={0} className={classes.typoRight_header}>
-                      {"매입액"}
+                      {"중량"}
                     </Paper>
                   </Grid>
                 </Grid>
               </div>
-            )}
+            </div>
+
             {this.state.itemList.length !== 0 &&
-              this.state.itemList.DATA.map((itemMainAccordion, index) => {
-                return (
-                  <Accordion
-                    defaultExpanded={this.state.mainAccordionExpand.includes(
-                      index
-                    )}
-                    onChange={this.handleExpandMainAccordion(index)}
-                    TransitionProps={{ unmountOnExit: true }}
-                    square
-                    key={index}
-                  >
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Grid className={classes.container} container>
-                        <Grid item xs={6} sm={6}>
-                          <Paper
-                            elevation={0}
-                            className={classes.summaryHeader}
-                          >
-                            {this.state.criteria === "date"
-                              ? itemMainAccordion.BUY_DATE.substring(0, 4) +
-                                "/" +
-                                itemMainAccordion.BUY_DATE.substring(4, 6) +
-                                "/" +
-                                itemMainAccordion.BUY_DATE.substring(6, 8)
-                              : itemMainAccordion.BUY_CUST_NAME}
-                          </Paper>
-                        </Grid>
-                        <Grid item xs={2} sm={2}>
-                          <Paper
-                            elevation={0}
-                            className={classes.summarySubHeader_QUANTITY}
-                          >
-                            {numberWithCommas(itemMainAccordion.QUANTITY)}
-                          </Paper>
-                        </Grid>
-                        <Grid item xs={4} sm={4}>
-                          <Paper
-                            elevation={0}
-                            className={classes.summarySubHeader_AMOUNT}
-                          >
-                            {numberWithCommas(itemMainAccordion.TOT_AMOUNT)}
-                          </Paper>
-                        </Grid>
-                      </Grid>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <div className={classes.innerAccordion}>
-                        {this.state.itemList.DATA_2.map(
-                          (itemSubAccordion, index) => {
-                            if (this.state.criteria === "date") {
-                              if (
-                                itemMainAccordion.BUY_DATE ===
-                                itemSubAccordion.BUY_DATE
-                              ) {
-                                return (
-                                  <Accordion
-                                    defaultExpanded={this.state.subAccordionExpand.includes(
-                                      index
-                                    )}
-                                    onChange={this.handleExpandSubAccordion(
-                                      index
-                                    )}
-                                    TransitionProps={{ unmountOnExit: true }}
-                                    square
-                                    key={index}
-                                  >
-                                    <AccordionSummary
-                                      classes={{
-                                        expandIcon: classes.expandIcon,
-                                      }}
-                                      className={classes.innerAccordionSummary}
-                                      expandIcon={<ExpandMoreIcon />}
-                                    >
-                                      <Grid
-                                        className={classes.container}
-                                        container
-                                      >
-                                        <Grid item xs={6} sm={6}>
-                                          <Paper
-                                            elevation={0}
-                                            className={
-                                              classes.innerSummaryHeader
-                                            }
-                                          >
-                                            {itemSubAccordion.BUY_CUST_NAME}
-                                          </Paper>
-                                        </Grid>
-                                        <Grid item xs={2} sm={2}>
-                                          <Paper
-                                            elevation={0}
-                                            className={
-                                              classes.innerSummarySubHeader_QUANTITY
-                                            }
-                                          >
-                                            {numberWithCommas(
-                                              itemSubAccordion.QUANTITY
-                                            )}
-                                          </Paper>
-                                        </Grid>
-                                        <Grid item xs={4} sm={4}>
-                                          <Paper
-                                            elevation={0}
-                                            className={
-                                              classes.innerSummarySubHeader_AMOUNT
-                                            }
-                                          >
-                                            {numberWithCommas(
-                                              itemSubAccordion.TOT_AMOUNT
-                                            )}
-                                          </Paper>
-                                        </Grid>
-                                      </Grid>
-                                    </AccordionSummary>
-                                    {this.state.itemList.DATA_3.map(
-                                      (itemDetailData, index) => {
-                                        if (
-                                          itemSubAccordion.BUY_CUST_CD ===
-                                            itemDetailData.BUY_CUST_CD &&
-                                          itemSubAccordion.BUY_DATE ===
-                                            itemDetailData.BUY_DATE
-                                        ) {
-                                          return (
-                                            <div
-                                              className={classes.itemView}
-                                              key={index}
-                                            >
-                                              <Divider
-                                                className={classes.divider}
-                                              />
-                                              <AccordionDetails>
-                                                <Grid
-                                                  className={classes.container}
-                                                  container
-                                                >
-                                                  <Grid item xs={7} sm={7}>
-                                                    <Paper
-                                                      elevation={0}
-                                                      className={
-                                                        classes.paperLeft
-                                                      }
-                                                    >
-                                                      {"분류 :   " +
-                                                        nullCheck(
-                                                          itemDetailData.GROUP_NAME
-                                                        ) +
-                                                        " "}
-                                                    </Paper>
-                                                  </Grid>
-                                                  <Grid item xs={5} sm={5}>
-                                                    <Paper
-                                                      elevation={0}
-                                                      className={
-                                                        classes.paperRight
-                                                      }
-                                                    >
-                                                      {"수량 :   " +
-                                                        numberWithCommas(
-                                                          nullCheck(
-                                                            itemDetailData.QUANTITY
-                                                          ) +
-                                                            nullCheck(
-                                                              itemDetailData.UNIT_NAME
-                                                            )
-                                                        )}
-                                                    </Paper>
-                                                  </Grid>
-                                                  <Grid item xs={7} sm={7}>
-                                                    <Paper
-                                                      elevation={0}
-                                                      className={
-                                                        classes.paperLeft
-                                                      }
-                                                    >
-                                                      {"품목 :   " +
-                                                        nullCheck(
-                                                          itemDetailData.CLASS_NAME
-                                                        ) +
-                                                        " "}
-                                                    </Paper>
-                                                  </Grid>
-                                                  <Grid item xs={5} sm={5}>
-                                                    <Paper
-                                                      elevation={0}
-                                                      className={
-                                                        classes.paperRight
-                                                      }
-                                                    >
-                                                      {"단가 :   " +
-                                                        numberWithCommas(
-                                                          nullCheck(
-                                                            itemDetailData.GROSS_UNIT_PRICE
-                                                          )
-                                                        )}
-                                                    </Paper>
-                                                  </Grid>
-                                                  <Grid item xs={7} sm={7}>
-                                                    <Paper
-                                                      elevation={0}
-                                                      className={
-                                                        classes.paperLeft
-                                                      }
-                                                    >
-                                                      {"규격 :   " +
-                                                        nullCheck(
-                                                          itemDetailData.PRODUCT_NAME
-                                                        ) +
-                                                        " "}
-                                                    </Paper>
-                                                  </Grid>
-                                                  <Grid item xs={5} sm={5}>
-                                                    <Paper
-                                                      elevation={0}
-                                                      className={
-                                                        classes.paperRight
-                                                      }
-                                                    >
-                                                      {"금액 :   "}
-                                                      {numberWithCommas(
-                                                        itemDetailData.TOT_AMOUNT
-                                                      )}
-                                                    </Paper>
-                                                  </Grid>
-                                                </Grid>
-                                              </AccordionDetails>
-                                            </div>
-                                          );
-                                        } else return null;
-                                      }
-                                    )}
-                                  </Accordion>
-                                );
-                              } else return null;
-                            } else {
-                              if (
-                                itemMainAccordion.BUY_CUST_CD ===
-                                itemSubAccordion.BUY_CUST_CD
-                              ) {
-                                return (
-                                  <Accordion
-                                    defaultExpanded={this.state.subAccordionExpand.includes(
-                                      index
-                                    )}
-                                    onChange={this.handleExpandSubAccordion(
-                                      index
-                                    )}
-                                    TransitionProps={{ unmountOnExit: true }}
-                                    square
-                                    key={index}
-                                  >
-                                    <AccordionSummary
-                                      classes={{
-                                        expandIcon: classes.expandIcon,
-                                      }}
-                                      className={classes.innerAccordionSummary}
-                                      expandIcon={<ExpandMoreIcon />}
-                                    >
-                                      <Grid
-                                        className={classes.container}
-                                        container
-                                      >
-                                        <Grid item xs={6} sm={6}>
-                                          <Paper
-                                            elevation={0}
-                                            className={
-                                              classes.innerSummaryHeader
-                                            }
-                                          >
-                                            {itemSubAccordion.BUY_DATE.substring(
-                                              0,
-                                              4
-                                            ) +
-                                              "/" +
-                                              itemSubAccordion.BUY_DATE.substring(
-                                                4,
-                                                6
-                                              ) +
-                                              "/" +
-                                              itemSubAccordion.BUY_DATE.substring(
-                                                6,
-                                                8
-                                              )}
-                                          </Paper>
-                                        </Grid>
-                                        <Grid item xs={2} sm={2}>
-                                          <Paper
-                                            elevation={0}
-                                            className={
-                                              classes.innerSummarySubHeader_QUANTITY
-                                            }
-                                          >
-                                            {numberWithCommas(
-                                              itemSubAccordion.QUANTITY
-                                            )}
-                                          </Paper>
-                                        </Grid>
-                                        <Grid item xs={4} sm={4}>
-                                          <Paper
-                                            elevation={0}
-                                            className={
-                                              classes.innerSummarySubHeader_AMOUNT
-                                            }
-                                          >
-                                            {numberWithCommas(
-                                              itemSubAccordion.TOT_AMOUNT
-                                            )}
-                                          </Paper>
-                                        </Grid>
-                                      </Grid>
-                                    </AccordionSummary>
-                                    {this.state.itemList.DATA_3.map(
-                                      (itemDetailData, index) => {
-                                        if (
-                                          itemSubAccordion.BUY_DATE ===
-                                            itemDetailData.BUY_DATE &&
-                                          itemSubAccordion.BUY_CUST_CD ===
-                                            itemDetailData.BUY_CUST_CD
-                                        ) {
-                                          return (
-                                            <div
-                                              className={classes.itemView}
-                                              key={index}
-                                            >
-                                              <Divider
-                                                className={classes.divider}
-                                              />
-                                              <AccordionDetails>
-                                                <Grid
-                                                  className={classes.container}
-                                                  container
-                                                >
-                                                  <Grid item xs={7} sm={7}>
-                                                    <Paper
-                                                      elevation={0}
-                                                      className={
-                                                        classes.paperLeft
-                                                      }
-                                                    >
-                                                      {"분류 :   " +
-                                                        nullCheck(
-                                                          itemDetailData.GROUP_NAME
-                                                        ) +
-                                                        " "}
-                                                    </Paper>
-                                                  </Grid>
-                                                  <Grid item xs={5} sm={5}>
-                                                    <Paper
-                                                      elevation={0}
-                                                      className={
-                                                        classes.paperRight
-                                                      }
-                                                    >
-                                                      {"수량 :   " +
-                                                        numberWithCommas(
-                                                          nullCheck(
-                                                            itemDetailData.QUANTITY
-                                                          ) +
-                                                            nullCheck(
-                                                              itemDetailData.UNIT_NAME
-                                                            )
-                                                        )}
-                                                    </Paper>
-                                                  </Grid>
-                                                  <Grid item xs={7} sm={7}>
-                                                    <Paper
-                                                      elevation={0}
-                                                      className={
-                                                        classes.paperLeft
-                                                      }
-                                                    >
-                                                      {"품목 :   " +
-                                                        nullCheck(
-                                                          itemDetailData.CLASS_NAME
-                                                        ) +
-                                                        " "}
-                                                    </Paper>
-                                                  </Grid>
-                                                  <Grid item xs={5} sm={5}>
-                                                    <Paper
-                                                      elevation={0}
-                                                      className={
-                                                        classes.paperRight
-                                                      }
-                                                    >
-                                                      {"단가 :   " +
-                                                        numberWithCommas(
-                                                          nullCheck(
-                                                            itemDetailData.GROSS_UNIT_PRICE
-                                                          )
-                                                        )}
-                                                    </Paper>
-                                                  </Grid>
-                                                  <Grid item xs={7} sm={7}>
-                                                    <Paper
-                                                      elevation={0}
-                                                      className={
-                                                        classes.paperLeft
-                                                      }
-                                                    >
-                                                      {"규격 :   " +
-                                                        nullCheck(
-                                                          itemDetailData.PRODUCT_NAME
-                                                        ) +
-                                                        " "}
-                                                    </Paper>
-                                                  </Grid>
-                                                  <Grid item xs={5} sm={5}>
-                                                    <Paper
-                                                      elevation={0}
-                                                      className={
-                                                        classes.paperRight
-                                                      }
-                                                    >
-                                                      {"금액 :   "}
-                                                      {numberWithCommas(
-                                                        itemDetailData.TOT_AMOUNT
-                                                      )}
-                                                    </Paper>
-                                                  </Grid>
-                                                </Grid>
-                                              </AccordionDetails>
-                                            </div>
-                                          );
-                                        } else return null;
-                                      }
-                                    )}
-                                  </Accordion>
-                                );
-                              } else return null;
-                            }
+              this.state.itemList.DATA.map((item, index) => {
+                if (item.SORT_VAL === "1") {
+                  return (
+                    <div>
+                      <TreeView
+                        sx={{
+                          flexGrow: 1,
+                          maxWidth: "100%",
+                          backgroundColor: "white",
+                          overflowY: "auto",
+                        }}
+                      >
+                        <TreeItem
+                          nodeId="1"
+                          label={
+                            item.NAME_NM +
+                            " " +
+                            item.SIZE_VAL +
+                            " " +
+                            item.STOCK_QUANTITY +
+                            " " +
+                            item.STOCK_WEIGHT
                           }
-                        )}
+                        >
+                          <TreeItem nodeId="2" label={<table border="1">
+                              <tr>
+                                <td
+                                  style={{ minWidth: "25%", maxWidth: "25%" }}
+                                >
+                                  <span style={{ fontSize: "10px" }}>
+                                    <b>재질</b>
+                                    <br />
+                                    <b>사업장</b>
+                                  </span>
+                                </td>
+                                <td
+                                  style={{ minWidth: "25%", maxWidth: "25%" }}
+                                >
+                                  <span style={{ fontSize: "10px" }}>
+                                    <b>도유</b>
+                                    <br />　
+                                  </span>
+                                </td>
+                                <td style={{ marginLeft: "30%" }}>
+                                  <span style={{ fontSize: "10px" }}>
+                                    <b>후처리</b>
+                                    <br />　
+                                  </span>
+                                </td>
+                                <td style={{ marginLeft: "30%" }}>
+                                  <span style={{ fontSize: "10px" }}>
+                                    <b>YP</b>
+                                    <br />
+                                    <b>C</b>
+                                  </span>
+                                </td>
+                                <td style={{ marginLeft: "30%" }}>
+                                  <span style={{ fontSize: "10px" }}>
+                                    <b>TS</b>
+                                    <br />
+                                    <b>Si</b>
+                                  </span>
+                                </td>
+                                <td style={{ marginLeft: "30%" }}>
+                                  <span style={{ fontSize: "10px" }}>
+                                    <b>EL</b>
+                                    <br />
+                                    <b>Mn</b>
+                                  </span>
+                                </td>
+                                <td style={{ marginLeft: "30%" }}>
+                                  <span style={{ fontSize: "10px" }}>
+                                    <b>수량</b>
+                                    <br />　
+                                  </span>
+                                </td>
+                                <td align="right" style={{ marginLeft: "3%" }}>
+                                  <span style={{ fontSize: "10px" }}>
+                                    <b>중량</b>
+                                    <br />
+                                    <b>매입단가</b>
+                                  </span>
+                                </td>
+                              </tr>
+                            </table>} />
+                        </TreeItem>
+                        {renderList(
+                            index + 1,
+                            this.state.itemList,
+                            this.state.itemList.DATA.length
+                          )}
+                      </TreeView>
                       </div>
-                    </AccordionDetails>
-                  </Accordion>
-                );
-              })}
-          </div>
-        )}
-        {this.state.itemList.SUM_AMOUNT !== undefined && (
+       )}
+
+        {
           <div className={classes.footer}>
             <Grid className={classes.container} container>
-              <Grid item xs={5} sm={5}>
+              <Grid item xs={6} sm={6}>
                 <Paper elevation={0} className={classes.typo_footer}>
                   {"합계"}
                 </Paper>
@@ -964,14 +560,14 @@ class Menu1 extends PureComponent {
                   {numberWithCommas(String(this.state.itemList.TOTAL_QUANTITY))}
                 </Paper>
               </Grid>
-              <Grid item xs={4} sm={4}>
+              <Grid item xs={3} sm={3}>
                 <Paper elevation={0} className={classes.typoRight_footer}>
                   {numberWithCommas(String(this.state.itemList.SUM_AMOUNT))}
                 </Paper>
               </Grid>
             </Grid>
           </div>
-        )}
+        }
       </div>
     );
   }

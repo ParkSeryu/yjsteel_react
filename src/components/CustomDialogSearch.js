@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import Divider from "@material-ui/core/Divider";
 import List from "@mui/material/List";
@@ -36,7 +36,7 @@ const CssTextField = withStyles({
 
 const useStyles = makeStyles((theme) => ({
   text: {
-    fontSize:'0.85rem',
+    fontSize: "0.85rem",
   },
 
   paper: {
@@ -72,11 +72,10 @@ function CustomDialog(props) {
   const { codeKind, open, onClose } = props;
   const [loading, setLoading] = useState(false);
 
-
   const handleClose = () => {
     onClose("exit", "exit");
-    dataList = {};  
-    keyword="";
+    dataList = {};
+    keyword = "";
   };
 
   const handleOnChange = (e) => {
@@ -85,53 +84,51 @@ function CustomDialog(props) {
 
   const handleListItemClick = (codeName, codeCd) => {
     dataList = {};
-    keyword="";
+    keyword = "";
     onClose(codeName, codeCd);
   };
-
 
   const getCode = () => {
     dataList = {};
     setLoading(true);
     let text = keyword;
 
-    if(codeKind === "stan_cd"){
-    axios
-      .get("http://192.168.35.147/m_api/index.php/code/getStanCd", {
-        params: {
-          search: text,
-        },
-      })
-      .then((response) => {
-        if (response.data.RESULT_CODE === "200") {
-          dataList = response.data.STAN_CD;
-          setTimeout(() => {
-            setLoading(false);
-          }, 1000);
-        }else{
-          setLoading(false);
-          dataList = {};
-        }
-      });
-    }
-    else{
+    if (codeKind === "stan_cd") {
       axios
-      .get("http://192.168.35.147/m_api/index.php/code/getCustCd", {
-        params: {
-          search: text,
-        },
-      })
-      .then((response) => {
-        if (response.data.RESULT_CODE === "200") {
-          dataList = response.data.CUST_CD;
-          setTimeout(() => {
+        .get("http://192.168.0.137/m_api/index.php/code/getStanCd", {
+          params: {
+            search: text,
+          },
+        })
+        .then((response) => {
+          if (response.data.RESULT_CODE === "200") {
+            dataList = response.data.STAN_CD;
+            setTimeout(() => {
+              setLoading(false);
+            }, 1000);
+          } else {
             setLoading(false);
-          }, 1000);
-        }else{
-          setLoading(false);
-          dataList = {};
-        }
-      });
+            dataList = {};
+          }
+        });
+    } else {
+      axios
+        .get("http://192.168.0.137/m_api/index.php/code/getCustCd", {
+          params: {
+            search: text,
+          },
+        })
+        .then((response) => {
+          if (response.data.RESULT_CODE === "200") {
+            dataList = response.data.CUST_CD;
+            setTimeout(() => {
+              setLoading(false);
+            }, 1000);
+          } else {
+            setLoading(false);
+            dataList = {};
+          }
+        });
     }
   };
 
@@ -171,25 +168,35 @@ function CustomDialog(props) {
           <div>
             {dataList.length > 0 ? (
               dataList.map((listData) => (
-                <>
-                {/* {console.log("rendering")} */}
+                <div key={listData.CODE_CD}>
+                  {/* {console.log("rendering")} */}
                   <List>
-                    <ListItem  button disablePadding>
-                      <ListItemText classes={{primary:classes.text}} primary={
-                        listData.CODE_CD + "　" + 
-                        listData.CODE_NM} 
-                        onClick={() => handleListItemClick(listData.CODE_NM, listData.CODE_CD)}/>
+                    <ListItem button disablePadding>
+                      <ListItemText
+                        classes={{ primary: classes.text }}
+                        primary={listData.CODE_CD + "　" + listData.CODE_NM}
+                        onClick={() =>
+                          handleListItemClick(
+                            listData.CODE_NM,
+                            listData.CODE_CD
+                          )
+                        }
+                      />
                     </ListItem>
                   </List>
-                  <Divider/>
-                </>
+                  <Divider />
+                </div>
               ))
             ) : (
               <div
                 className={classes.box}
                 style={{ display: "flex", justifyContent: "center" }}
               >
-                {loading ? <CircularProgress size={70} /> : <span> No Search Data </span>}
+                {loading ? (
+                  <CircularProgress size={70} />
+                ) : (
+                  <span> No Search Data </span>
+                )}
               </div>
             )}
           </div>
