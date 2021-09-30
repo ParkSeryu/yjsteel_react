@@ -50,10 +50,6 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(8),
   },
 
-  td: {
-    padding: "1vw",
-  },
-
   numberTextField: {
     width: "25vw",
   },
@@ -137,7 +133,6 @@ const useStyles = makeStyles((theme) => ({
 
   table: {
     width: "100%",
-    padding: "1vw",
     borderCollapse: "separate",
     borderSpacing: "0 5px",
     marginLeft: "-6px",
@@ -188,7 +183,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
+function Menu2_Search({ history, programName, parentState, openSearchToggle }) {
   const classes = useStyles();
 
   window.addEventListener("checkBackFlag", funCheckDialogFlag, {
@@ -605,10 +600,10 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
             </colgroup>
             <tbody>
               <tr>
-                <td className={classes.td} align="right">
+                <td align="right">
                   <span className={classes.span}>소유</span>
                 </td>
-                <td className={classes.td}>
+                <td>
                   <CssTextField
                     fullWidth
                     name="im_cls"
@@ -635,10 +630,10 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
             </tbody>
             <tbody>
               <tr>
-                <td className={classes.td} align="right">
+                <td align="right">
                   <span className={classes.span}>품명</span>
                 </td>
-                <td className={classes.td}>
+                <td>
                   <CssTextField
                     fullWidth
                     name="name_cd"
@@ -665,10 +660,10 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
             </tbody>
             <tbody>
               <tr>
-                <td className={classes.td} align="right">
+                <td align="right">
                   <span className={classes.span}>재질</span>
                 </td>
-                <td className={classes.td}>
+                <td>
                   <CssTextField
                     placeholder="입력 or 찾기"
                     name="stan_nm"
@@ -691,10 +686,10 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
             </tbody>
             <tbody>
               <tr>
-                <td className={classes.td} align="right">
+                <td align="right">
                   <span className={classes.span}>수요가명</span>
                 </td>
-                <td className={classes.td}>
+                <td>
                   <CssTextField
                     name="cust_nm"
                     placeholder="입력 or 찾기"
@@ -718,10 +713,10 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
             </tbody>
             <tbody>
               <tr>
-                <td className={classes.td} align="right">
+                <td align="right">
                   <span className={classes.span}>두께</span>
                 </td>
-                <td className={classes.td}>
+                <td>
                   <CssTextField
                     placeholder="0.0"
                     name="thick_f"
@@ -754,10 +749,10 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
             </tbody>
             <tbody>
               <tr>
-                <td className={classes.td} align="right">
+                <td align="right">
                   <span className={classes.span}>폭</span>
                 </td>
-                <td className={classes.td}>
+                <td>
                   <CssTextField
                     placeholder="0.0"
                     name="width_f"
@@ -790,10 +785,10 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
             </tbody>
             <tbody>
               <tr>
-                <td className={classes.td} align="right">
+                <td align="right">
                   <span className={classes.span}>사업장</span>
                 </td>
-                <td className={classes.td} align="center">
+                <td align="center">
                   <CssTextField
                     name="work_cust_nm"
                     placeholder="선택"
@@ -821,10 +816,10 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
             </tbody>
             <tbody>
               <tr>
-                <td className={classes.td} align="right">
+                <td align="right">
                   <span className={classes.span}>재고구분</span>
                 </td>
-                <td className={classes.td} align="center">
+                <td align="center">
                   <CssTextField
                     name="stock_cls_nm"
                     placeholder="선택"
@@ -852,10 +847,10 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
             </tbody>
             <tbody>
               <tr>
-                <td className={classes.td} align="right">
+                <td align="right">
                   <span className={classes.span}>유형</span>
                 </td>
-                <td className={classes.td} align="center">
+                <td align="center">
                   <CssTextField
                     name="search_type_cls_nm"
                     placeholder="선택"
@@ -955,11 +950,11 @@ function Menu1_Search({ history, programName, parentState, openSearchToggle }) {
   );
 }
 
-Menu1_Search.propTypes = {
+Menu2_Search.propTypes = {
   history: PropTypes.object,
   programName: PropTypes.string,
   parentState: PropTypes.func,
   openSearchToggle: PropTypes.bool,
 };
 
-export default React.memo(withRouter(Menu1_Search));
+export default React.memo(withRouter(Menu2_Search));

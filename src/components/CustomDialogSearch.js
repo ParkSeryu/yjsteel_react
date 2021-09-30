@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import Divider from "@material-ui/core/Divider";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import ListItemText from "@mui/material/ListItemText";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -37,6 +35,14 @@ const CssTextField = withStyles({
 const useStyles = makeStyles((theme) => ({
   text: {
     fontSize: "0.85rem",
+  },
+
+  test: {
+    width: "100%",
+    padding: "12px 0",
+    margin: 0,
+    borderBottom: "1px solid rgba(0, 0, 0, .4)",
+    fontSize: "14px",
   },
 
   paper: {
@@ -103,9 +109,7 @@ function CustomDialog(props) {
         .then((response) => {
           if (response.data.RESULT_CODE === "200") {
             dataList = response.data.STAN_CD;
-            setTimeout(() => {
-              setLoading(false);
-            }, 1000);
+            setLoading(false);
           } else {
             setLoading(false);
             dataList = {};
@@ -121,9 +125,7 @@ function CustomDialog(props) {
         .then((response) => {
           if (response.data.RESULT_CODE === "200") {
             dataList = response.data.CUST_CD;
-            setTimeout(() => {
-              setLoading(false);
-            }, 1000);
+            setLoading(false);
           } else {
             setLoading(false);
             dataList = {};
@@ -168,23 +170,14 @@ function CustomDialog(props) {
           <div>
             {dataList.length > 0 ? (
               dataList.map((listData) => (
-                <div key={listData.CODE_CD}>
-                  {/* {console.log("rendering")} */}
-                  <List>
-                    <ListItem button disablePadding>
-                      <ListItemText
-                        classes={{ primary: classes.text }}
-                        primary={listData.CODE_CD + "　" + listData.CODE_NM}
-                        onClick={() =>
-                          handleListItemClick(
-                            listData.CODE_NM,
-                            listData.CODE_CD
-                          )
-                        }
-                      />
-                    </ListItem>
-                  </List>
-                  <Divider />
+                <div
+                  className={classes.test}
+                  key={listData.CODE_CD}
+                  onClick={() =>
+                    handleListItemClick(listData.CODE_NM, listData.CODE_CD)
+                  }
+                >
+                  <span>{listData.CODE_CD + "　" + listData.CODE_NM}</span>
                 </div>
               ))
             ) : (

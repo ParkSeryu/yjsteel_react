@@ -2,14 +2,55 @@ import React, { PureComponent } from "react";
 import axios from "axios";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { withStyles } from "@material-ui/core/styles";
-import Menu1_Search from "./Menu1_Search";
+import Menu2_Search from "./Menu2_Search";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
-import imgA from "../../images/test.gif";
+import MuiAccordion from "@material-ui/core/Accordion";
+import MuiAccordionSummary from "@material-ui/core/AccordionSummary";
+import MuiAccordionDetails from "@material-ui/core/AccordionDetails";
+import Divider from "@material-ui/core/Divider";
+
+const Accordion = withStyles({
+  root: {
+    borderLeft: "1px solid rgba(0, 0, 0, .4)",
+    borderRight: "1px solid rgba(0, 0, 0, .4)",
+    margin: 0,
+    padding: 0,
+    boxShadow: "none",
+
+    "&:before": {
+      display: "none",
+    },
+    "&$expanded": {
+      margin: "auto",
+    },
+  },
+  expanded: {},
+})(MuiAccordion);
+
+const AccordionSummary = withStyles({
+  root: {
+    backgroundColor: "white",
+    borderTop: "1px solid rgba(0, 0, 0, .2)",
+    marginBottom: -1,
+    height: 56,
+    "&$expanded": {
+      minHeight: "100%",
+    },
+  },
+  //  expanded: {},
+})(MuiAccordionSummary);
+
+const AccordionDetails = withStyles({
+  root: {
+    padding: "1vh 2vw",
+  },
+})(MuiAccordionDetails);
 
 const useStyles = (theme) => ({
   root: {
-    width: "100%",
+    width: "98vw",
+    marginLeft: "1vw",
     marginTop: "97px",
     marginBottom: "38px",
   },
@@ -25,8 +66,15 @@ const useStyles = (theme) => ({
     borderBottom: "3px solid #E4E4E4",
   },
 
+  innerAccordion: {
+    width: "100%",
+    margin: 0,
+    padding: 0,
+  },
+
   header: {
     position: "fixed",
+    marginLeft: "-5px",
     width: "100%",
     height: "40px",
     backgroundColor: "rgba(099, 100, 102, 1)",
@@ -200,6 +248,10 @@ const useStyles = (theme) => ({
   },
 });
 
+const numberWithCommas = (x) => {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
 const nullCheck = (text) => {
   if (text === null) return "-";
   else return text;
@@ -215,47 +267,65 @@ const renderList = (index, data, length, classes) => {
   let result = [];
   for (i; i < length && data.DATA[i].SORT_VAL !== "1"; i++) {
     result.push(
-      <div style={{ padding: "5px 0px" }}>
-        <tr>
-          <td align="center" style={{ width: "20%" }}>
+      <>
+        <Grid item xs={2}>
+          <Paper className={classes.innerSummaryContents} elevation={0}>
             {data.DATA[i].CODE_NM}
-          </td>
-          <td align="center" style={{ width: "14%" }}>
-            {" "}
+            <br />
+            {data.DATA[i].WORK_CUST_NM}
+          </Paper>
+        </Grid>
+        <Grid item xs={1}>
+          <Paper className={classes.innerSummaryContents} elevation={0}>
             {nullCheck(data.DATA[i].OIL_NM)}
-          </td>
-          <td style={{ width: "14%" }}>
+          </Paper>
+        </Grid>
+        <Grid item xs={2}>
+          <Paper className={classes.innerSummaryContents} elevation={0}>
             {nullCheck(data.DATA[i].AFTER_PROC_NM)}
-          </td>
-          <td style={{ width: "10%" }}> {nullCheck(data.DATA[i].YP)}</td>
-          <td style={{ width: "10%" }}> {nullCheck(data.DATA[i].TS)}</td>
-          <td style={{ width: "10%" }}> {nullCheck(data.DATA[i].EL)}</td>
-          <td align="left" style={{ width: "12%" }}>
+          </Paper>
+        </Grid>
+        <Grid item xs={1}>
+          <Paper className={classes.innerSummaryContents} elevation={0}>
+            {nullCheck(data.DATA[i].YP)}
+            <br />
+            {nullCheckZero(data.DATA[i].C)}
+          </Paper>
+        </Grid>
+        <Grid item xs={1}>
+          <Paper className={classes.innerSummaryContents} elevation={0}>
+            {nullCheck(data.DATA[i].TS)}
+            <br />
+            {nullCheckZero(data.DATA[i].SI)}
+          </Paper>
+        </Grid>
+        <Grid item xs={1}>
+          <Paper className={classes.innerSummaryContents} elevation={0}>
+            {nullCheck(data.DATA[i].EL)}
+            <br />
+            {nullCheckZero(data.DATA[i].MN)}
+          </Paper>
+        </Grid>
+        <Grid item xs={2}>
+          <Paper className={classes.innerSummaryContents} elevation={0}>
             {data.DATA[i].SUMMARY_QUANTITY_VAL}
-          </td>
-          <td align="right" style={{ width: "16%", paddingRight: "5px" }}>
+          </Paper>
+        </Grid>
+        <Grid item xs={2}>
+          <Paper className={classes.innerSummaryContents} elevation={0}>
             {data.DATA[i].STOCK_WEIGHT}
-          </td>
-        </tr>
-        <tr>
-          <td style={{ width: "20%" }}> {data.DATA[i].WORK_CUST_NM}</td>
-          <td style={{ width: "14%" }}></td>
-          <td style={{ width: "14%" }}></td>
-          <td style={{ width: "10%" }}> {nullCheckZero(data.DATA[i].C)}</td>
-          <td style={{ width: "10%" }}> {nullCheckZero(data.DATA[i].SI)}</td>
-          <td style={{ width: "10%" }}> {nullCheckZero(data.DATA[i].MN)}</td>
-          <td align="center" style={{ width: "12%" }}></td>
-          <td align="right" style={{ width: "16%", paddingRight: "5px" }}>
+            <br />
             {data.DATA[i].BUY_UNIT_PRICE}
-          </td>
-        </tr>
-      </div>
+          </Paper>
+        </Grid>
+        <Divider className={classes.divider} />
+      </>
     );
   }
   return result;
 };
 
-class Menu1 extends PureComponent {
+class Menu2 extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -384,15 +454,15 @@ class Menu1 extends PureComponent {
       <div>
         {this.state.loading === true ? (
           <div>
-            <Menu1_Search programName={"소재재고현황"} />
+            <Menu2_Search programName={"출고요청현황"} />
             <div className={classes.circular_progress}>
-              <img src={imgA} />
+              <CircularProgress disableShrink color="secondary" size={60} />
             </div>
           </div>
         ) : (
           <div className={classes.root}>
-            <Menu1_Search
-              programName={"소재재고현황"}
+            <Menu2_Search
+              programName={"출고요청현황"}
               parentState={this.loadItem}
               openSearchToggle={this.state.openSearchToggle}
             />
@@ -428,110 +498,146 @@ class Menu1 extends PureComponent {
                 if (item.SORT_VAL === "1") {
                   return (
                     <div>
-                      <details>
-                        <summary>
-                          <table
-                            style={{
-                              width: "100%",
-                              padding: "10px 1vw",
-                              borderBottom: "0.5px solid rgba(0 ,0, 0, .4)",
-                              overflowX: "clip",
-                              tableLayout: "fixed",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            <tbody>
-                              <td style={{ width: "30%" }}>
-                                <b>{item.NAME_NM}</b>
-                              </td>
-                              <td style={{ width: "35%" }}>{item.SIZE_VAL}</td>
-                              <td style={{ width: "13%", textAlign: "right" }}>
+                      <Accordion
+                        defaultExpanded={this.state.mainAccordionExpand.includes(
+                          index
+                        )}
+                        onChange={this.handleExpandMainAccordion(index)}
+                        TransitionProps={{ unmountOnExit: true }}
+                        square
+                        key={index}
+                      >
+                        <AccordionSummary>
+                          <Grid className={classes.container} container>
+                            <Grid item xs={3} sm={3}>
+                              <Paper
+                                elevation={0}
+                                className={classes.summaryHeader}
+                              >
+                                {item.NAME_NM}
+                              </Paper>
+                            </Grid>
+                            <Grid item xs={5} sm={5}>
+                              <Paper
+                                elevation={0}
+                                className={classes.summarySubHeader_SIZE}
+                              >
+                                {item.SIZE_VAL}
+                              </Paper>
+                            </Grid>
+                            <Grid item xs={2} sm={2}>
+                              <Paper
+                                elevation={0}
+                                className={classes.summarySubHeader_QUANTITY}
+                              >
                                 {item.STOCK_QUANTITY}
-                              </td>
-                              <td style={{ width: "22%", textAlign: "right" }}>
+                              </Paper>
+                            </Grid>
+                            <Grid item xs={2} sm={2}>
+                              <Paper
+                                elevation={0}
+                                className={classes.summarySubHeader_WEIGHT}
+                              >
                                 {item.STOCK_WEIGHT}
-                              </td>
-                            </tbody>
-                          </table>
-                        </summary>
-                        <table
-                          style={{
-                            width: "100%",
-                            padding: "10px 0px",
-                            borderBottom: "0.5px solid rgba(0 ,0, 0, .4)",
-                            tableLayout: "fixed",
-                            background: "#E4E4E4",
-                            fontSize: "13px",
-                          }}
-                        >
-                          <tbody>
-                            <tr>
-                              <td
-                                align="center"
-                                style={{ width: "20%", left: "15px" }}
+                              </Paper>
+                            </Grid>
+                          </Grid>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.innerAccordion}>
+                          <Grid className={classes.containers} container>
+                            <Grid item xs={2}>
+                              <Paper
+                                className={classes.innerSummaryHeader}
+                                elevation={0}
                               >
                                 재질
-                              </td>
-                              <td align="center" style={{ width: "14%" }}>
+                                <br />
+                                <span styled={{ marginTop: "10px" }}>
+                                  사업장
+                                </span>
+                              </Paper>
+                            </Grid>
+                            <Grid item xs={1}>
+                              <Paper
+                                className={classes.innerSummaryHeader}
+                                elevation={0}
+                              >
                                 도유
-                              </td>
-                              <td style={{ width: "14%" }}>후처리</td>
-                              <td style={{ width: "10%" }}>YP</td>
-                              <td style={{ width: "10%" }}>TS</td>
-                              <td style={{ width: "10%" }}>EL</td>
-                              <td align="center" style={{ width: "12%" }}>
+                              </Paper>
+                            </Grid>
+                            <Grid item xs={2}>
+                              <Paper
+                                className={classes.innerSummaryHeader}
+                                elevation={0}
+                              >
+                                후처리
+                              </Paper>
+                            </Grid>
+                            <Grid item xs={1}>
+                              <Paper
+                                className={classes.innerSummaryHeader}
+                                elevation={0}
+                              >
+                                YP
+                                <br />C
+                              </Paper>
+                            </Grid>
+                            <Grid item xs={1}>
+                              <Paper
+                                className={classes.innerSummaryHeader}
+                                elevation={0}
+                              >
+                                TS
+                                <br />
+                                Si
+                              </Paper>
+                            </Grid>
+                            <Grid item xs={1}>
+                              <Paper
+                                className={classes.innerSummaryHeader}
+                                elevation={0}
+                              >
+                                EL
+                                <br />
+                                Mn
+                              </Paper>
+                            </Grid>
+                            <Grid item xs={2}>
+                              <Paper
+                                className={classes.innerSummaryHeader}
+                                elevation={0}
+                              >
                                 수량
-                              </td>
-                              <td
-                                align="right"
-                                style={{ width: "16%", paddingRight: "5px" }}
+                              </Paper>
+                            </Grid>
+                            <Grid item xs={2}>
+                              <Paper
+                                className={classes.innerSummaryHeader}
+                                elevation={0}
                               >
                                 중량
-                              </td>
-                            </tr>
-                            <tr>
-                              <td align="center" style={{ width: "20%" }}>
-                                사업장
-                              </td>
-                              <td style={{ width: "14%" }}></td>
-                              <td style={{ width: "14%" }}></td>
-                              <td style={{ width: "10%" }}>C</td>
-                              <td style={{ width: "10%" }}>Si</td>
-                              <td style={{ width: "10%" }}>Mn</td>
-                              <td align="center" style={{ width: "12%" }}></td>
-                              <td
-                                align="right"
-                                style={{ width: "16%", paddingRight: "5px" }}
-                              >
+                                <br />
                                 매입단가
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                        <table
-                          style={{
-                            tableLayout: "fixed",
-                            width: "100%",
-                            padding: "10px 0px",
-                            borderBottom: "0.5px solid rgba(0 ,0, 0, .4)",
-                            fontSize: "14px",
-                          }}
-                        >
-                          <tbody>
-                            {/* {renderList(
+                              </Paper>
+                            </Grid>
+                          </Grid>
+                        </AccordionDetails>
+                        <AccordionDetails className={classes.innerAccordion}>
+                          <Grid className={classes.container} container>
+                            {renderList(
                               index + 1,
                               this.state.itemList,
                               this.state.itemList.DATA.length,
                               classes
-                            )} */}
-                          </tbody>
-                        </table>
-                      </details>
+                            )}
+                          </Grid>
+                        </AccordionDetails>
+                      </Accordion>
                     </div>
                   );
                 }
               })}
-            {/* {this.state.itemList.TOTAL_WEIGHT !== undefined && (
+            {this.state.itemList.TOTAL_WEIGHT !== undefined && (
               <div className={classes.footer}>
                 <Grid className={classes.container} container>
                   <Grid item xs={6} sm={6}>
@@ -555,7 +661,7 @@ class Menu1 extends PureComponent {
                   </Grid>
                 </Grid>
               </div>
-            )} */}
+            )}
           </div>
         )}
       </div>
@@ -563,4 +669,4 @@ class Menu1 extends PureComponent {
   }
 }
 
-export default withStyles(useStyles)(Menu1);
+export default withStyles(useStyles)(Menu2);

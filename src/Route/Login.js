@@ -56,10 +56,10 @@ const useStyles = makeStyles((theme) => ({
   button: {
     marginTop: theme.spacing(1),
     height: "55px",
-    backgroundColor: "#555765",
+    backgroundColor: "#5EB3D7",
     color: "#FFFFFF",
     "&:focus": {
-      backgroundColor: "#555765",
+      backgroundColor: "#5EB3D7",
     },
   },
 
@@ -285,12 +285,17 @@ function Login(props) {
   return (
     <div>
       <AppBar
-        style={{ background: "#2F313E" }}
+        style={{ background: "#DADCE0" }}
         className={classes.AppBar}
         position="static"
       >
         <Toolbar>
-          <Typography align="center" variant="h6" component="div">
+          <Typography
+            style={{ color: "black" }}
+            align="center"
+            variant="h6"
+            component="div"
+          >
             영진철강(주)
           </Typography>
         </Toolbar>

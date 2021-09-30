@@ -18,26 +18,26 @@ import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 const useStyles = makeStyles((theme) => ({
   AppBar: {
     zIndex: theme.zIndex.drawer + 1,
-    backgroundColor: "#2F313E",
+    backgroundColor: "#DADCE0",
     color: "#000000",
     height: "55px",
   },
 
   menuButton: {
-    color: "#FFFFFF",
+    color: "#000000",
     marginTop: "5px",
   },
 
   title: {
     fontFamily: "NanumGothic",
     marginTop: "5px",
-    color: "#FFFFFF",
+    color: "#000000",
   },
 
   menuInform: {
     position: "fixed",
     zIndex: 2,
-    backgroundColor: "#2F313E",
+    backgroundColor: "#538CBD",
     width: "65vw",
   },
 
@@ -151,7 +151,7 @@ function AppBars({ history, programName }) {
           <ListItemText
             primary={
               <Typography type="body2" className={classes.primaryText}>
-                logo
+                (주)영진철강
               </Typography>
             }
             secondary={
