@@ -69,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
   },
 
   backdrop: {
-    zIndex: theme.zIndex.drawer + 1,
+    zIndex: 1252,
     color: "#fff",
   },
 }));
@@ -100,7 +100,6 @@ function Login(props) {
 
   const handleClickAgree = () => {
     setOpen(false);
-    setLoading(false);
     successLogin();
   };
 
@@ -127,18 +126,24 @@ function Login(props) {
       let form = new FormData();
       form.append("token", token);
       axios
-        .post("http://192.168.0.137/m_api/index.php/login/findToken", form)
+        .post(
+          "http://121.165.242.72:5050/m_api/index.php/login/findToken",
+          form
+        )
         .then((response) => {
           console.log(JSON.stringify(response));
           if (response.data.RESULT_CODE === "200") {
             result = response.data.DATA.LOGIN_ID;
             console.log(result); //
             axios
-              .get("http://192.168.0.137/m_api/index.php/login/getPassword", {
-                params: {
-                  id: result,
-                },
-              })
+              .get(
+                "http://121.165.242.72:5050/m_api/index.php/login/getPassword",
+                {
+                  params: {
+                    id: result,
+                  },
+                }
+              )
               .then((response) => {
                 result = response.data.DATA;
                 signIn(result.LOGIN_ID, result.PASSWORD);
@@ -180,7 +185,7 @@ function Login(props) {
     form.append("pass", pass);
 
     axios
-      .post("http://192.168.0.137/m_api/index.php/login/signIn", form)
+      .post("http://121.165.242.72:5050/m_api/index.php/login/signIn", form)
       .then((response) => {
         console.log(response);
 
@@ -194,10 +199,14 @@ function Login(props) {
               "user_name",
               response.data.DATA.HNAME
             );
+            window.sessionStorage.setItem(
+              "player_id",
+              response.data.DATA.PLAYER_ID
+            );
 
             axios
               .get(
-                "http://192.168.0.137/m_api/index.php/login/searchOverlapToken",
+                "http://121.165.242.72:5050/m_api/index.php/login/searchOverlapToken",
                 {
                   params: {
                     id: response.data.DATA.LOGIN_ID,
@@ -229,7 +238,7 @@ function Login(props) {
 
   const successLogin = () => {
     axios
-      .get("http://192.168.0.137/m_api/index.php/login/programList", {
+      .get("http://121.165.242.72:5050/m_api/index.php/login/programList", {
         params: {
           id: window.sessionStorage.getItem("user_id"),
         },
@@ -242,7 +251,7 @@ function Login(props) {
 
           axios
             .post(
-              "http://192.168.0.137/m_api/index.php/login/updateToken",
+              "http://121.165.242.72:5050/m_api/index.php/login/updateToken",
               form
             )
             .then((response) => {
@@ -266,6 +275,26 @@ function Login(props) {
                   "cust_cd_list",
                   JSON.stringify(ListData.data.CUST_CD)
                 );
+
+                window.sessionStorage.setItem(
+                  "emp_cd_list",
+                  JSON.stringify(ListData.data.EMP_CD)
+                );
+
+                window.sessionStorage.setItem(
+                  "part_cd_list",
+                  JSON.stringify(ListData.data.PART_CD)
+                );
+
+                window.sessionStorage.setItem(
+                  "job_cust_list",
+                  JSON.stringify(ListData.data.JOB_CUST_LIST)
+                );
+
+                // window.sessionStorage.setItem(
+                //   "dlv_cust_cd_list",
+                //   JSON.stringify(ListData.data.DLV_CUST_CD)
+                // );
 
                 props.history.replace({
                   pathname: "/home",

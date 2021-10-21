@@ -3,12 +3,12 @@ import PropTypes from "prop-types";
 import Container from "@material-ui/core/Container";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
-import CustomDialogSearch from "../../components/CustomDialogSearch";
 import IconButton from "@material-ui/core/IconButton";
 import ClearIcon from "@material-ui/icons/Clear";
 import { withStyles } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/core/styles";
 import CustomDialogOnlySelect from "../../components/CustomDialogOnlySelect";
+import axios from "axios";
 import Drawer from "@material-ui/core/Drawer";
 import SearchIcon from "@material-ui/icons/Search";
 import format from "date-fns/format";
@@ -46,10 +46,6 @@ const useStyles = makeStyles((theme) => ({
 
   numberTextField: {
     width: "25vw",
-  },
-
-  grow: {
-    flexGrow: 1,
   },
 
   title: {
@@ -134,13 +130,14 @@ class koLocalizedUtils extends DateFnsUtils {
   }
 }
 
-function Menu2_Search({ parentState }) {
+function Menu8_Search({ parentState }) {
   const classes = useStyles();
   let today = new Date();
   let year = today.getFullYear();
   let month = ("0" + (1 + today.getMonth())).slice(-2);
-  let month_f = ("0" + today.getMonth()).slice(-2);
   let date = ("0" + today.getDate()).slice(-2);
+  let date_p = ("0" + (today.getDate() - 1)).slice(-2);
+  let date_n = ("0" + (today.getDate() + 1)).slice(-2);
 
   window.addEventListener("checkBackFlag", funCheckDialogFlag, {
     once: true,
@@ -149,29 +146,9 @@ function Menu2_Search({ parentState }) {
   function funCheckDialogFlag() {
     let count = 0;
     if (count === 0) {
-      if (openDialogSearch) {
-        setOpenDialogSearch(false);
-        console.log("dialog");
-        count = count + 1;
-      }
-      if (openAlertDialog) {
-        setOpenAlertDialog(false);
-        console.log("alertDialog");
-        count = count + 1;
-      }
       if (openDialogOnlySelect) {
         setOpenDialogOnlySelect(false);
         console.log("onlySelectDialog");
-        count = count + 1;
-      }
-      if (openDialogMultiSelect) {
-        setOpenDialogMultiSelect(false);
-        console.log("multiSelectDialog");
-        count = count + 1;
-      }
-      if (openCalendar) {
-        setOpenCalendar(false);
-        console.log("calendar");
         count = count + 1;
       }
     }
@@ -192,48 +169,35 @@ function Menu2_Search({ parentState }) {
   }
 
   const [inputs, setInputs] = useState({
-    date_f: year + "/" + month_f + "/" + date,
-    date_t: year + "/" + month + "/" + date,
-    im_cls: "1",
-    im_cls_nm: "자사",
-    search_ship_status: "6",
-    search_ship_status_nm: "미출고",
-    cust_cd: "",
-    cust_nm: "",
-    thick_f: "",
-    thick_t: "",
-    width_f: "",
-    width_t: "",
+    date_f: year + "/" + month + "/" + date_p,
+    date_t: year + "/" + month + "/" + date_n,
+    job_cust_cd: "YJ004",
+    job_cust_nm: "영진철강(주)",
+    plant_cust_cd: "201",
+    plant_cust_nm: "SL1",
+    job_status_cust_cd: "2",
+    job_status_cust_nm: "계획",
     work_cust_cd: "",
     work_cust_nm: "",
-    maker_cd: window.sessionStorage.getItem("user_id"),
-    maker_nm: window.sessionStorage.getItem("user_name"),
   });
 
   const {
     date_f,
     date_t,
-    im_cls_nm,
-    search_ship_status_nm,
-    cust_nm,
-    thick_f,
-    thick_t,
-    width_f,
-    width_t,
+    job_cust_cd,
+    job_cust_nm,
+    plant_cust_nm,
+    job_status_cust_nm,
     work_cust_nm,
-    maker_nm,
   } = inputs;
   const [codeKind, setCodeKind] = React.useState("");
-  const [codeListSearch, setCodeListSearch] = React.useState([]);
   const [codeListDataOnlySelect, setCodeListDataOnlySelect] = React.useState(
     []
   );
   const [openSearch, setOpenSearch] = React.useState(true);
-  const [openDialogSearch, setOpenDialogSearch] = useState(false);
   const [openDialogOnlySelect, setOpenDialogOnlySelect] = useState(false);
-  const [openDialogMultiSelect, setOpenDialogMultiSelect] = useState(false);
-  const [openAlertDialog, setOpenAlertDialog] = React.useState(false);
   const [openCalendar, setOpenCalendar] = React.useState(false);
+
   const handleOnChange = (e) => {
     const { value, name } = e.target;
     setInputs({
@@ -246,20 +210,26 @@ function Menu2_Search({ parentState }) {
     if (code_kind === "date") {
       setInputs({
         ...inputs,
-        date_f: year + "/" + month_f + "/" + date,
-        date_t: year + "/" + month + "/" + date,
+        date_f: year + "/" + month + "/" + date_p,
+        date_t: year + "/" + month + "/" + date_n,
       });
-    } else if (code_kind === "cust_nm") {
+    } else if (code_kind === "job_cust_cd") {
       setInputs({
         ...inputs,
-        cust_cd: "",
-        cust_nm: "",
+        job_cust_cd: "",
+        job_cust_nm: "",
       });
-    } else if (code_kind === "maker_nm") {
+    } else if (code_kind === "plant_cust_cd") {
       setInputs({
         ...inputs,
-        maker_cd: "",
-        maker_nm: "",
+        plant_cust_cd: "",
+        plant_cust_nm: "",
+      });
+    } else if (code_kind === "job_status_cust_cd") {
+      setInputs({
+        ...inputs,
+        job_status_cust_cd: "",
+        job_status_cust_nm: "",
       });
     } else if (code_kind === "work_cust_cd") {
       setInputs({
@@ -270,50 +240,47 @@ function Menu2_Search({ parentState }) {
     }
   };
 
-  const handleClickOpenSearch = (code_kind) => {
-    setCodeKind(code_kind);
-    if (code_kind === "maker_cd") {
-      setCodeListSearch(
-        JSON.parse(window.sessionStorage.getItem("emp_cd_list"))
-      );
-    } else if (code_kind === "cust_cd") {
-      setCodeListSearch(
-        JSON.parse(window.sessionStorage.getItem("cust_cd_list"))
-      );
-    }
-    setOpenDialogSearch(true);
-  };
-
   const handleClickOpenOnlySelect = (code_kind) => {
     setCodeKind(code_kind);
-    if (code_kind === "im_cls") {
+    if (code_kind === "job_cust_cd") {
+      setCodeListDataOnlySelect(
+        JSON.parse(window.sessionStorage.getItem("job_cust_list"))
+      );
+    } else if (code_kind === "job_status_cust_cd") {
       setCodeListDataOnlySelect([
         { CODE_CD: "0", CODE_NAME: "전체" },
-        { CODE_CD: "1", CODE_NAME: "자사" },
-        { CODE_CD: "2", CODE_NAME: "임가공" },
-        { CODE_CD: "3", CODE_NAME: "보관(자사)" },
-        { CODE_CD: "4", CODE_NAME: "보관(임가공)" },
-        { CODE_CD: "6", CODE_NAME: "보관(가공)" },
+        { CODE_CD: "2", CODE_NAME: "계획" },
+        { CODE_CD: "4", CODE_NAME: "완료" },
       ]);
-    } else if (code_kind === "search_ship_status") {
-      setCodeListDataOnlySelect([
-        { CODE_CD: "", CODE_NAME: "전체" },
-        { CODE_CD: "0", CODE_NAME: "요청" },
-        { CODE_CD: "1", CODE_NAME: "출고" },
-        { CODE_CD: "2", CODE_NAME: "지시" },
-        { CODE_CD: "3", CODE_NAME: "생산" },
-        { CODE_CD: "4", CODE_NAME: "계획" },
-        { CODE_CD: "5", CODE_NAME: "출고중" },
-        { CODE_CD: "6", CODE_NAME: "미출고" },
-        { CODE_CD: "21", CODE_NAME: "지시(1차)" },
-        { CODE_CD: "41", CODE_NAME: "계획(1차)" },
-        { CODE_CD: "31", CODE_NAME: "생산(1차)" },
-      ]);
+    } else if (code_kind === "plant_cust_cd") {
+      axios
+        .get("http://121.165.242.72:5050/m_api/index.php/Menu8/getPlantCust", {
+          params: {
+            job_cust_cd: job_cust_cd,
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          if (response.data.RESULT_CODE === "200") {
+            // data라는 이름으로 json 파일에 있는 값에 state값을 바꿔준다.
+            let temp = [];
+
+            response.data.DATA.map((item) => {
+              temp.push({ CODE_CD: item.CODE_CD, CODE_NAME: item.CODE_NM });
+              console.log(temp);
+            });
+
+            setCodeListDataOnlySelect(temp);
+          }
+        })
+        .catch((e) => {
+          console.error(e); // 에러표시
+        });
     } else if (code_kind === "work_cust_cd") {
       setCodeListDataOnlySelect([
         { CODE_CD: "0", CODE_NAME: "전체" },
-        { CODE_CD: "ES014", CODE_NAME: "(주)에스에이" },
         { CODE_CD: "YJ004", CODE_NAME: "영진철강(주)" },
+        { CODE_CD: "ES014", CODE_NAME: "(주)에스에이" },
       ]);
     }
     setOpenDialogOnlySelect(true);
@@ -325,22 +292,6 @@ function Menu2_Search({ parentState }) {
     setOpenCalendar(!openCalendar);
   };
 
-  const handleCloseSearch = (codeName, codeCd) => {
-    if (codeCd === undefined) {
-      codeName = "";
-      codeCd = "";
-    }
-
-    if (codeName !== "exit")
-      if (codeKind === "maker_cd") {
-        setInputs({ ...inputs, maker_cd: codeCd, maker_nm: codeName });
-      } else if (codeKind === "cust_cd") {
-        setInputs({ ...inputs, cust_cd: codeCd, cust_nm: codeName });
-      }
-
-    setOpenDialogSearch(false);
-  };
-
   const handleCloseOnlySelect = (codeName, codeCd) => {
     if (codeCd === undefined) {
       codeName = "";
@@ -348,10 +299,22 @@ function Menu2_Search({ parentState }) {
     }
 
     if (codeName !== "exit")
-      if (codeKind === "im_cls") {
-        setInputs({ ...inputs, im_cls: codeCd, im_cls_nm: codeName });
+      if (codeKind === "job_cust_cd") {
+        setInputs({ ...inputs, job_cust_cd: codeCd, job_cust_nm: codeName });
       } else if (codeKind === "work_cust_cd") {
         setInputs({ ...inputs, work_cust_cd: codeCd, work_cust_nm: codeName });
+      } else if (codeKind === "plant_cust_cd") {
+        setInputs({
+          ...inputs,
+          plant_cust_cd: codeCd,
+          plant_cust_nm: codeName,
+        });
+      } else if (codeKind === "job_status_cust_cd") {
+        setInputs({
+          ...inputs,
+          job_status_cust_cd: codeCd,
+          job_status_cust_nm: codeName,
+        });
       }
 
     setOpenDialogOnlySelect(false);
@@ -379,7 +342,7 @@ function Menu2_Search({ parentState }) {
               <tbody>
                 <tr>
                   <td align="right">
-                    <span className={classes.span}>등록일</span>
+                    <span className={classes.span}>편성일</span>
                   </td>
                   <td className={classes.td}>
                     <CssTextField
@@ -406,69 +369,26 @@ function Menu2_Search({ parentState }) {
                 </tr>
                 <tr>
                   <td className={classes.td} align="right">
-                    <span className={classes.span}>소유</span>
+                    <span className={classes.span}>작업장</span>
                   </td>
                   <td className={classes.td}>
                     <CssTextField
                       fullWidth
-                      name="im_cls"
+                      name="job_cust_cd"
                       size="small"
                       placeholder="선택"
                       variant="outlined"
                       onChange={handleOnChange}
-                      onClick={() => handleClickOpenOnlySelect("im_cls")}
-                      value={im_cls_nm}
+                      onClick={() => handleClickOpenOnlySelect("job_cust_cd")}
+                      value={job_cust_nm}
                       InputProps={{
                         readOnly: true,
                       }}
                     />
-                  </td>
-                </tr>
-                <tr>
-                  <td className={classes.td} align="right">
-                    <span className={classes.span}>출고구분</span>
-                  </td>
-                  <td className={classes.td}>
-                    <CssTextField
-                      fullWidth
-                      name="im_cls"
-                      size="small"
-                      placeholder="선택"
-                      variant="outlined"
-                      onChange={handleOnChange}
-                      onClick={() =>
-                        handleClickOpenOnlySelect("search_ship_status")
-                      }
-                      value={search_ship_status_nm}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <td className={classes.td} align="right">
-                    <span className={classes.span}>수요가명</span>
-                  </td>
-                  <td className={classes.td}>
-                    <CssTextField
-                      name="cust_nm"
-                      placeholder="선택"
-                      fullWidth
-                      size="small"
-                      onChange={handleOnChange}
-                      className={classes.textField}
-                      value={cust_nm}
-                      variant="outlined"
-                      onClick={() => handleClickOpenSearch("cust_cd")}
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    {cust_nm.length > 0 && (
+                    {job_cust_nm.length > 0 && (
                       <IconButton
                         className={classes.clearIcon}
-                        onClick={() => handleClearIcon("cust_nm")}
+                        onClick={() => handleClearIcon("job_cust_cd")}
                       >
                         <ClearIcon fontSize="small" />
                       </IconButton>
@@ -477,72 +397,64 @@ function Menu2_Search({ parentState }) {
                 </tr>
                 <tr>
                   <td className={classes.td} align="right">
-                    <span className={classes.span}>두께</span>
+                    <span className={classes.span}>편성라인</span>
                   </td>
                   <td className={classes.td}>
                     <CssTextField
-                      placeholder="0.0"
-                      name="thick_f"
-                      onChange={handleOnChange}
+                      name="plant_cust_nm"
+                      placeholder="선택"
+                      fullWidth
                       size="small"
-                      className={classes.numberTextField}
+                      onChange={handleOnChange}
+                      className={classes.textField}
+                      value={plant_cust_nm}
                       variant="outlined"
-                      value={thick_f}
-                      inputProps={{
-                        inputMode: "numeric",
-                        style: { textAlign: "center" },
+                      onClick={() => handleClickOpenOnlySelect("plant_cust_cd")}
+                      InputProps={{
+                        readOnly: true,
                       }}
                     />
-                    <object className={classes.spanVerticalAlign}>~</object>
-                    <CssTextField
-                      placeholder="0.0"
-                      name="thick_t"
-                      onChange={handleOnChange}
-                      size="small"
-                      className={classes.numberTextField}
-                      variant="outlined"
-                      value={thick_t}
-                      inputProps={{
-                        inputMode: "numeric",
-                        style: { textAlign: "center" },
-                      }}
-                    />
+                    {plant_cust_nm.length > 0 && (
+                      <IconButton
+                        className={classes.clearIcon}
+                        onClick={() => handleClearIcon("plant_cust_cd")}
+                      >
+                        <ClearIcon fontSize="small" />
+                      </IconButton>
+                    )}
                   </td>
                 </tr>
                 <tr>
                   <td className={classes.td} align="right">
-                    <span className={classes.span}>폭</span>
+                    <span className={classes.span}>진행상태</span>
                   </td>
                   <td className={classes.td}>
                     <CssTextField
-                      placeholder="0.0"
-                      name="width_f"
-                      onChange={handleOnChange}
+                      fullWidth
+                      name="job_status_cust_nm"
                       size="small"
-                      className={classes.numberTextField}
+                      placeholder="선택"
+                      onChange={handleOnChange}
+                      onClick={() =>
+                        handleClickOpenOnlySelect("job_status_cust_cd")
+                      }
+                      value={job_status_cust_nm}
                       variant="outlined"
-                      value={width_f}
-                      inputProps={{
-                        inputMode: "numeric",
-                        style: { textAlign: "center" },
+                      InputProps={{
+                        readOnly: true,
                       }}
                     />
-                    <object className={classes.spanVerticalAlign}>~</object>
-                    <CssTextField
-                      placeholder="0.0"
-                      name="width_t"
-                      onChange={handleOnChange}
-                      size="small"
-                      className={classes.numberTextField}
-                      variant="outlined"
-                      value={width_t}
-                      inputProps={{
-                        inputMode: "numeric",
-                        style: { textAlign: "center" },
-                      }}
-                    />
+                    {job_status_cust_nm.length > 0 && (
+                      <IconButton
+                        className={classes.clearIcon}
+                        onClick={() => handleClearIcon("job_status_cust_cd")}
+                      >
+                        <ClearIcon fontSize="small" />
+                      </IconButton>
+                    )}
                   </td>
                 </tr>
+
                 <tr>
                   <td className={classes.td} align="right">
                     <span className={classes.span}>사업장</span>
@@ -572,35 +484,6 @@ function Menu2_Search({ parentState }) {
                     )}
                   </td>
                 </tr>
-                <tr>
-                  <td className={classes.td} align="right">
-                    <span className={classes.span}>담당자</span>
-                  </td>
-                  <td className={classes.td} align="center">
-                    <CssTextField
-                      name="maker_nm"
-                      placeholder="선택"
-                      fullWidth
-                      size="small"
-                      onChange={handleOnChange}
-                      onClick={() => handleClickOpenSearch("maker_cd")}
-                      className={classes.textField}
-                      value={maker_nm}
-                      variant="outlined"
-                      InputProps={{
-                        readOnly: true,
-                      }}
-                    />
-                    {maker_nm.length > 0 && (
-                      <IconButton
-                        className={classes.clearIcon}
-                        onClick={() => handleClearIcon("maker_nm")}
-                      >
-                        <ClearIcon fontSize="small" />
-                      </IconButton>
-                    )}
-                  </td>
-                </tr>
               </tbody>
             </table>
 
@@ -610,22 +493,16 @@ function Menu2_Search({ parentState }) {
                 variant="contained"
                 onClick={() => {
                   setInputs({
-                    date_f: year + "/" + month_f + "/" + date,
-                    date_t: year + "/" + month + "/" + date,
-                    im_cls: "0",
-                    im_cls_nm: "자사",
-                    search_ship_status: "6",
-                    search_ship_status_nm: "미출고",
-                    cust_cd: "",
-                    cust_nm: "",
-                    thick_f: "",
-                    thick_t: "",
-                    width_f: "",
-                    width_t: "",
+                    date_f: year + "/" + month + "/" + date - 1,
+                    date_t: year + "/" + month + "/" + date + 1,
+                    job_cust_cd: "YJ004",
+                    job_cust_nm: "영진철강(주)",
+                    plant_cust_cd: "201",
+                    plant_cust_nm: "SL1",
+                    job_status_cust_cd: "2",
+                    job_status_cust_nm: "계획",
                     work_cust_cd: "",
                     work_cust_nm: "",
-                    maker_cd: window.sessionStorage.getItem("user_id"),
-                    maker_nm: window.sessionStorage.getItem("user_name"),
                   });
                 }}
               >
@@ -674,12 +551,6 @@ function Menu2_Search({ parentState }) {
             />
           </MuiPickersUtilsProvider>
 
-          <CustomDialogSearch
-            codeListData={codeListSearch}
-            open={openDialogSearch}
-            onClose={handleCloseSearch}
-          />
-
           <CustomDialogOnlySelect
             data={codeListDataOnlySelect}
             open={openDialogOnlySelect}
@@ -691,11 +562,10 @@ function Menu2_Search({ parentState }) {
   );
 }
 
-Menu2_Search.propTypes = {
-  history: PropTypes.object,
+Menu8_Search.propTypes = {
   programName: PropTypes.string,
   parentState: PropTypes.func,
   openSearchToggle: PropTypes.bool,
 };
 
-export default React.memo(Menu2_Search);
+export default React.memo(Menu8_Search);

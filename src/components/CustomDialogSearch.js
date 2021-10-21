@@ -1,17 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
-import Divider from "@material-ui/core/Divider";
 import InputAdornment from "@material-ui/core/InputAdornment";
-import ListItemText from "@mui/material/ListItemText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import TextField from "@material-ui/core/TextField";
 import { IconButton } from "@material-ui/core";
 import ClearIcon from "@material-ui/icons/Clear";
+import InfiniteScroll from "react-infinite-scroll-component";
 import Dialog from "@material-ui/core/Dialog";
-import axios from "axios";
-import SearchIcon from "@material-ui/icons/Search";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import Divider from "@material-ui/core/Divider";
 
 const CssTextField = withStyles({
   root: {
@@ -35,14 +32,6 @@ const CssTextField = withStyles({
 const useStyles = makeStyles((theme) => ({
   text: {
     fontSize: "0.85rem",
-  },
-
-  test: {
-    width: "100%",
-    padding: "12px 0",
-    margin: 0,
-    borderBottom: "1px solid rgba(0, 0, 0, .4)",
-    fontSize: "14px",
   },
 
   paper: {
@@ -70,68 +59,54 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-let dataList = {};
-let keyword = "";
+let index = 40;
 
-function CustomDialog(props) {
+function CustomDialogSearch(props) {
   const classes = useStyles();
-  const { codeKind, open, onClose } = props;
-  const [loading, setLoading] = useState(false);
+  const { codeListData, open, onClose } = props;
+  const [keyWord, setKeyWord] = useState("");
+  const [items, setItem] = useState([]);
+
+  const filteredList = codeListData.filter(
+    (data) => data.CODE_NM.indexOf(keyWord.toUpperCase()) !== -1
+  );
+
+  useEffect(() => {
+    setKeyWord("");
+    setItem(filteredList.slice(0, 40));
+  }, [open]);
+
+  useEffect(() => {
+    setItem(filteredList.slice(0, 40));
+    index = 40;
+  }, [keyWord]);
 
   const handleClose = () => {
     onClose("exit", "exit");
-    dataList = {};
-    keyword = "";
   };
 
-  const handleOnChange = (e) => {
-    keyword = e.target.value;
+  const handleChange = (e) => {
+    setKeyWord(e.target.value.toUpperCase());
   };
 
   const handleListItemClick = (codeName, codeCd) => {
-    dataList = {};
-    keyword = "";
     onClose(codeName, codeCd);
   };
 
-  const getCode = () => {
-    dataList = {};
-    setLoading(true);
-    let text = keyword;
+  const inputRef = useRef();
 
-    if (codeKind === "stan_cd") {
-      axios
-        .get("http://192.168.0.137/m_api/index.php/code/getStanCd", {
-          params: {
-            search: text,
-          },
-        })
-        .then((response) => {
-          if (response.data.RESULT_CODE === "200") {
-            dataList = response.data.STAN_CD;
-            setLoading(false);
-          } else {
-            setLoading(false);
-            dataList = {};
-          }
-        });
-    } else {
-      axios
-        .get("http://192.168.0.137/m_api/index.php/code/getCustCd", {
-          params: {
-            search: text,
-          },
-        })
-        .then((response) => {
-          if (response.data.RESULT_CODE === "200") {
-            dataList = response.data.CUST_CD;
-            setLoading(false);
-          } else {
-            setLoading(false);
-            dataList = {};
-          }
-        });
-    }
+  const RefhandleClear = () => {
+    setKeyWord("");
+    inputRef.current.focus();
+  };
+
+  const fetchMoreData = () => {
+    // a fake async api call like which sends
+    // 20 more records in .5 secs
+    setTimeout(() => {
+      setItem(items.concat(filteredList.slice(index, index + 40)));
+      index = index + 40;
+    }, 500);
   };
 
   return (
@@ -140,6 +115,7 @@ function CustomDialog(props) {
         onClose={handleClose}
         open={open}
         fullWidth
+        height={"100px"}
         classes={{ paper: classes.paper }}
       >
         <IconButton
@@ -152,51 +128,55 @@ function CustomDialog(props) {
           <CssTextField
             variant="outlined"
             size="small"
-            onChange={handleOnChange}
+            ref={inputRef}
+            onChange={handleChange}
+            value={keyWord}
             fullWidth
             placeholder="검색"
             InputProps={{
-              endAdornment: (
-                <InputAdornment onClick={() => getCode()} position="end">
+              endAdornment: keyWord.length > 0 && (
+                <InputAdornment onClick={() => RefhandleClear()} position="end">
                   <IconButton edge="end">
-                    <SearchIcon />
+                    <ClearIcon fontSize="small" />
                   </IconButton>
                 </InputAdornment>
               ),
             }}
           />
         </DialogTitle>
-        <DialogContent dividers className={"customDialog"}>
-          <div>
-            {dataList.length > 0 ? (
-              dataList.map((listData) => (
+        <DialogContent
+          dividers
+          style={{ padding: 0, margin: 0, height: "60vh" }}
+        >
+          <InfiniteScroll
+            dataLength={items.length}
+            next={fetchMoreData}
+            hasMore={true}
+            height={"60vh"}
+          >
+            {items.map((listData, index) => (
+              <>
                 <div
-                  className={classes.test}
-                  key={listData.CODE_CD}
+                  key={index}
+                  style={{
+                    fontSize: "13px",
+                    padding: "15px 0px",
+                    paddingLeft: "10px",
+                  }}
                   onClick={() =>
                     handleListItemClick(listData.CODE_NM, listData.CODE_CD)
                   }
                 >
-                  <span>{listData.CODE_CD + "　" + listData.CODE_NM}</span>
+                  <b>{listData.CODE_CD + "　" + listData.CODE_NM}</b>
                 </div>
-              ))
-            ) : (
-              <div
-                className={classes.box}
-                style={{ display: "flex", justifyContent: "center" }}
-              >
-                {loading ? (
-                  <CircularProgress size={70} />
-                ) : (
-                  <span> No Search Data </span>
-                )}
-              </div>
-            )}
-          </div>
+                <Divider />
+              </>
+            ))}
+          </InfiniteScroll>
         </DialogContent>
       </Dialog>
     </>
   );
 }
 
-export default React.memo(CustomDialog);
+export default React.memo(CustomDialogSearch);

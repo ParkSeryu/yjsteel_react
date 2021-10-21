@@ -20,11 +20,8 @@ const CssTextField = withStyles({
 
 const useStyles = makeStyles({
   toolbar: {
-    //backgroundColor: "lightgray",
     backgroundColor: "#FFFFFF",
     height: "35%",
-    // margin: 0,
-    // padding: 0,
   },
 
   root: {
@@ -32,7 +29,7 @@ const useStyles = makeStyles({
     marginTop: "10px",
   },
 
-  test: {
+  rightFloat: {
     float: "right",
   },
 
@@ -67,7 +64,6 @@ const StringToDate = (date_str) => {
   let sYear = yyyyMMdd.substring(0, 4);
   let sMonth = yyyyMMdd.substring(5, 7);
   let sDate = yyyyMMdd.substring(8, 10);
-
   return new Date(Number(sYear), Number(sMonth) - 1, Number(sDate));
 };
 
@@ -80,59 +76,51 @@ const DateToString = (date) => {
   return year + "/" + month + "/" + day;
 };
 
-function CustomToolbar(props) {
+function CustomToolbar(props, date_from, date_to) {
   const classes = useStyles();
-  const { date, setOpenView, onChange, openView } = props;
-  const [date_f, setDateFrom] = useState(
-    window.sessionStorage.getItem("date_f")
-  );
-  const [date_t, setDateTo] = useState(window.sessionStorage.getItem("date_t"));
+  const { date, setOpenView, openView, onChange } = props;
+  const [date_f, setDateFrom] = useState(date_from);
+  const [date_t, setDateTo] = useState(date_to);
   const [focus, setFocus] = useState("date_f");
-  const [count, setCount] = useState(0);
+  const [flag, setFlag] = useState(0);
 
   const handleChangeViewClick = (view) => (e) => {
     setOpenView(view);
   };
 
   const handleFocus = (type) => {
-    setCount(0);
+    setFlag(0);
     if (type === "date_f") {
+      onChange(StringToDate(date_f));
       setFocus("date_f");
-      if (date_f !== "") {
-        onChange(StringToDate(date_f));
-      }
     } else if (type === "date_t") {
+      onChange(StringToDate(date_t));
       setFocus("date_t");
-      if (date_t !== "") onChange(StringToDate(date_t));
     }
   };
 
-  () => {
-    useEffect;
-    if (!window.sessionStorage.getItem("acceptFlag") && openView === "date") {
+  useEffect(() => {
+    if (openView === "date") {
       if (focus === "date_f") {
-        window.sessionStorage.setItem("date_f", DateToString(date));
         setDateFrom(DateToString(date));
-        setCount(count + 1);
-        if (count !== 0) {
-          setFocus("date_t");
-          setCount(0);
+        window.sessionStorage.setItem("date_f", DateToString(date));
+        setFlag(flag + 1);
+        if (flag !== 0) {
+          handleFocus("date_t");
         }
       } else if (focus === "date_t") {
-        if (StringToDate(window.sessionStorage.getItem("date_f")) > date) {
+        if (StringToDate(date_f) > date) {
           alert("종료일은 시작일 이전에 설정할 수 없습니다.");
           onChange(StringToDate(date_f));
         } else {
-          window.sessionStorage.setItem("date_t", DateToString(date));
           setDateTo(DateToString(date));
+          window.sessionStorage.setItem("date_t", DateToString(date));
         }
       }
     } else {
-      setCount(0);
-      window.sessionStorage.removeItem("acceptFlag");
+      setFlag(0);
     }
-  },
-    [date, openView];
+  }, [date, openView]);
 
   return (
     <PickerToolbar className={classes.toolbar}>
@@ -143,13 +131,13 @@ function CustomToolbar(props) {
               className={classes.yearSelectionBox}
               onClick={handleChangeViewClick("year")}
             >
-              <ArrowDropDownIcon className={classes.test} />
+              <ArrowDropDownIcon className={classes.rightFloat} />
             </div>
             <div
               className={classes.monthSelectionBox}
               onClick={handleChangeViewClick("month")}
             >
-              <ArrowDropDownIcon className={classes.test} />
+              <ArrowDropDownIcon className={classes.rightFloat} />
             </div>
           </>
         )}

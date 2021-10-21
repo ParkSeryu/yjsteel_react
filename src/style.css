@@ -2,15 +2,19 @@
   padding: 0;
   margin: 0;
 }
+
+@font-face {
+  font-family: "NanumGothic";
+  src: url("./font/NanumGothic-Regular.ttf");
+}
+
+/* body {
+  display: "block";
+} */
+
 td {
   white-space: nowrap;
   overflow-x: clip;
-}
-summary {
-  list-style: none;
-}
-summary::-webkit-details-marker {
-  display: none;
 }
 
 a {
@@ -18,82 +22,91 @@ a {
   text-decoration: none;
 }
 
-body {
-  display: "block";
-  overflow: "auto";
+summary {
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
 }
 
-@font-face {
-  font-family: "NanumGothic";
-  src: url("./font/NanumGothic-Regular.ttf");
-}
-
-.customDialog {
-  overflow: auto;
-}
-
-.customDialog::-webkit-scrollbar {
+::-webkit-scrollbar {
   width: 1.5vw;
 }
 
-.customDialog::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.5);
   -webkit-border-radius: 10px;
   border-radius: 10px;
 }
 
-.customDialog::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   -webkit-border-radius: 10px;
   border-radius: 10px;
   background: rgba(211, 211, 211, 1);
   -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
 }
 
-.customDialog::-webkit-scrollbar-thumb:window-inactive {
+::-webkit-scrollbar-thumb:window-inactive {
   background: rgba(255, 255, 255, 1);
 }
 
-.MuiCardHeader-subheader {
-  size: 10px;
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1255;
+  animation: fadein 1s;
+  -moz-animation: fadein 1s; /* Firefox */
+  -webkit-animation: fadein 1s; /* Safari and Chrome */
+  -o-animation: fadein 1s; /* Opera */
 }
 
-.dotted-gradient {
-  width: 88vw;
-  height: 1px;
-  background-image: linear-gradient(
-    to right,
-    #333 40%,
-    rgba(255, 255, 255, 0) 20%
-  );
-  background-position: top;
-  background-size: 10px 1px;
-  background-repeat: repeat-x;
-  margin-left: 3vw;
+.modalBox {
+  position: fixed;
+  background-color: #ccc;
+  width: 100%;
+  height: 100%;
+  z-index: 1255;
 }
 
-table.type04 {
-  overflow: auto;
-  font-size: 3vw;
-  margin-top: 16vw;
-  border-collapse: collapse;
-  border-spacing: 1px;
-  text-align: left;
-  line-height: 1.5;
-  border-top: 1px solid #ccc;
+.hidden {
+  display: none;
 }
-table.type04 th {
-  width: 150px;
-  position: sticky;
-  top: 0px;
-  padding: 10px;
-  font-weight: bold;
-  vertical-align: top;
-  background-color: #d6d6d6;
-  border-bottom: 1px solid #ccc;
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
-table.type04 td {
-  width: 350px;
-  padding: 10px;
-  vertical-align: top;
-  border-bottom: 1px solid #ccc;
+@-moz-keyframes fadein {
+  /* Firefox */
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@-webkit-keyframes fadein {
+  /* Safari and Chrome */
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@-o-keyframes fadein {
+  /* Opera */
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

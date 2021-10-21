@@ -3,9 +3,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Divider from "@material-ui/core/Divider";
-import MenuItem from "@material-ui/core/MenuItem";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
@@ -17,10 +14,12 @@ import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 
 const useStyles = makeStyles((theme) => ({
   AppBar: {
-    zIndex: theme.zIndex.drawer + 1,
+    // drawer Zindex : 1250
+    zIndex: 1251,
     backgroundColor: "#DADCE0",
     color: "#000000",
     height: "55px",
+    position: "fixed",
   },
 
   menuButton: {
@@ -36,9 +35,9 @@ const useStyles = makeStyles((theme) => ({
 
   menuInform: {
     position: "fixed",
-    zIndex: 2,
     backgroundColor: "#538CBD",
     width: "65vw",
+    height: "125px",
   },
 
   line: {
@@ -61,6 +60,11 @@ const useStyles = makeStyles((theme) => ({
     color: "#FFFFFF",
   },
 
+  exit: {
+    paddingTop: "7px",
+    marginRight: "5px",
+  },
+
   logOutIcon: { float: "right", color: "#FFFFFF", marginRight: "1px" },
 
   logOut: {
@@ -68,13 +72,17 @@ const useStyles = makeStyles((theme) => ({
     color: "#FFFFFF",
   },
 
+  text: {
+    paddingTop: "15px",
+    marginLeft: "20px",
+  },
+
   menuItem: {
     zIndex: 1,
     fontFamily: "NanumGothic",
     width: "65vw",
+    padding: "15px 0px",
   },
-
-  span: { lineHeight: "40px" },
 
   button: {
     textAlign: "center",
@@ -83,12 +91,32 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function AppBars({ history, programName }) {
+function AppBars({ history, programName, programChange }) {
+  const classes = useStyles();
+  const [toggle, setToggle] = useState(false);
+  const list = JSON.parse(window.sessionStorage.getItem("program_list"));
+  const logOut = () => {
+    if (window.sessionStorage.getItem("userAgent") === "android") {
+      let token = window.BRIDGE.connectAndroid();
+      let form = new FormData();
+      form.append("login_id", window.sessionStorage.getItem("user_id"));
+      form.append("token", token);
+      axios
+        .post("http://121.165.242.72:5050/m_api/index.php/login/logout", form)
+        .then(() => {
+          history.replace({
+            pathname: "/",
+          });
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+  };
+
   window.addEventListener("checkBackFlag", funCheckFlag);
   function funCheckFlag() {
     let count = 0;
-
-    console.log(toggle);
 
     if (count === 0) {
       if (toggle) {
@@ -101,30 +129,9 @@ function AppBars({ history, programName }) {
     window.sessionStorage.setItem("closeFlag", count);
   }
 
-  const classes = useStyles();
-  const [toggle, setToggle] = useState(false);
-  const list = JSON.parse(window.sessionStorage.getItem("program_list"));
-
-  const logOut = () => {
-    if (window.sessionStorage.getItem("userAgent") === "android") {
-      let token = window.BRIDGE.connectAndroid();
-      let form = new FormData();
-      form.append("login_id", window.sessionStorage.getItem("user_id"));
-      form.append("token", token);
-      axios
-        .post("http://192.168.0.137/m_api/index.php/login/logout", form)
-        .then(() => {
-          history.replace({
-            pathname: "/",
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    }
-  };
   return (
     <div>
+      {console.log("AppBarRender")}
       <AppBar className={classes.AppBar}>
         <Toolbar>
           <IconButton
@@ -136,7 +143,11 @@ function AppBars({ history, programName }) {
             <MenuIcon />
           </IconButton>
 
-          <Typography variant="h6" className={classes.title}>
+          <Typography
+            variant="h6"
+            id="programNameText"
+            className={classes.title}
+          >
             {programName}
           </Typography>
         </Toolbar>
@@ -147,57 +158,52 @@ function AppBars({ history, programName }) {
         onClose={() => setToggle(!toggle)}
         onOpen={() => setToggle(!toggle)}
       >
-        <ListItem className={classes.menuInform}>
-          <ListItemText
-            primary={
-              <Typography type="body2" className={classes.primaryText}>
-                (주)영진철강
+        <div className={classes.menuInform}>
+          <div className={classes.text}>
+            <Typography type="body2" className={classes.primaryText}>
+              영진철강(주)
+            </Typography>
+            <Typography
+              type="body2"
+              gutterBottom
+              className={classes.secondaryText}
+            >
+              {window.sessionStorage.getItem("user_name")}
+            </Typography>
+          </div>
+          <span
+            onClick={() => {
+              setToggle(!toggle);
+              logOut();
+            }}
+          >
+            <div className={classes.exit}>
+              <Typography type="body2" className={classes.logOut}>
+                로그아웃
               </Typography>
-            }
-            secondary={
-              <>
-                <Typography
-                  type="body2"
-                  gutterBottom
-                  className={classes.secondaryText}
-                >
-                  {window.sessionStorage.getItem("user_name")}
-                </Typography>
-                <span
-                  onClick={() => {
-                    setToggle(!toggle);
-                    logOut();
-                  }}
-                >
-                  <Typography type="body2" className={classes.logOut}>
-                    로그아웃
-                  </Typography>
-                  <ExitToAppIcon className={classes.logOutIcon} />
-                </span>
-              </>
-            }
-          />
+              <ExitToAppIcon className={classes.logOutIcon} />
+            </div>
+          </span>
           <CloseIcon
             onClick={() => setToggle(!toggle)}
             className={classes.closeIcon}
           />
-        </ListItem>
+        </div>
         <Divider className={classes.line} />
         {list.map((listData) => {
           return (
             <div key={listData.PROGRAM_ID}>
-              <MenuItem
+              <div
                 className={classes.menuItem}
-                onClick={() => {
-                  if (programName !== listData.PROGRAM_NM) {
-                    history.push({
-                      pathname: "/" + listData.PROGRAM_ID,
-                    });
-                  }
-                }}
+                onClick={() => (
+                  setToggle(false),
+                  programChange(listData.PROGRAM_ID, listData.PROGRAM_NM)
+                )}
               >
-                {listData.PROGRAM_NM}
-              </MenuItem>
+                <span style={{ paddingLeft: "15px" }}>
+                  {listData.PROGRAM_NM}
+                </span>
+              </div>
               <Divider />
             </div>
           );
@@ -207,4 +213,4 @@ function AppBars({ history, programName }) {
   );
 }
 
-export default withRouter(AppBars);
+export default React.memo(withRouter(AppBars));

@@ -4,7 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import imgA from "../../images/loading.gif";
-import Menu2Search from "./Menu2_Search";
+import Menu6Search from "./Menu6_Search";
 
 const numberWithCommas = (x) => {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -101,7 +101,7 @@ const useStyles = (theme) => ({
     padding: "5px 0",
     margin: 0,
     paddingRight: "30px",
-    textAlign: "center",
+    textAlign: "right",
     backgroundColor: "transparent",
   },
 });
@@ -116,7 +116,7 @@ const nullCheckZero = (text) => {
   else return text;
 };
 
-class Menu2 extends PureComponent {
+class Menu6 extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -140,23 +140,26 @@ class Menu2 extends PureComponent {
     });
 
     axios
-      .get("http://121.165.242.72:5050/m_api/index.php/Menu2/retrieve", {
+      .get("http://121.165.242.72:5050/m_api/index.php/Menu6/retrieve", {
         params: {
           date_f: data.date_f !== null ? data.date_f.replaceAll("/", "") : "",
           date_t: data.date_t !== null ? data.date_t.replaceAll("/", "") : "",
-          im_cls: data.im_cls,
-          name_cd: data.name_cd, // 품명
+          name_cd: data.name_cd,
           name_nm: data.name_nm,
+          stan_cd: data.stan_cd,
+          stan_nm: data.stan_nm,
           thick_f: data.thick_f,
           thick_t: data.thick_t,
           width_f: data.width_f,
           width_t: data.width_t,
-          ship_status_cls: data.search_ship_status,
+          maker_cd: data.maker_cd,
+          maker_nm: data.maker_nm,
           sell_cust_cd: data.sell_cust_cd,
           sell_cust_nm: data.sell_cust_nm,
           work_cust_cd: data.work_cust_cd,
-          maker_cd: data.maker_nm,
-          maker_nm: data.maker_nm,
+          relation_cd: data.relation_cd,
+          part_cd: data.part_cd,
+          out_cls: data.out_cls,
         },
       })
       .then((response) => {
@@ -208,31 +211,45 @@ class Menu2 extends PureComponent {
         >
           <tbody>
             <tr>
-              <td align="left" style={{ width: "30%", paddingLeft: "5px" }}>
+              <td align="left" style={{ width: "25%", paddingLeft: "2px" }}>
                 {name_nm[0]}
               </td>
-              <td style={{ width: "30%", paddingLeft: "5px" }}>
+              <td style={{ width: "30%", paddingLeft: "2px" }}>
                 {dtl_info[0]}
               </td>
               <td align="right" style={{ width: "20%" }}>
                 {quantity_line[0]}
               </td>
-              <td align="right" style={{ width: "20%", paddingRight: "5px" }}>
+              <td align="right" style={{ width: "20%" }}>
                 {weight[0]}
               </td>
             </tr>
             <tr>
-              <td align="left" style={{ width: "30%", paddingLeft: "5px" }}>
+              <td align="left" style={{ width: "25%", paddingLeft: "2px" }}>
                 <span>{name_nm[1]}</span>
               </td>
-              <td style={{ width: "30%", paddingLeft: "10px" }}>
+              <td style={{ width: "30%", paddingLeft: "2px" }}>
                 {dtl_info[1]}
               </td>
               <td align="right" style={{ width: "20%" }}>
                 {quantity_line[1]}
               </td>
-              <td align="right" style={{ width: "20%", paddingRight: "5px" }}>
+              <td align="right" style={{ width: "20%" }}>
                 {weight[1]}
+              </td>
+            </tr>
+            <tr>
+              <td align="left" style={{ width: "25%", paddingLeft: "2px" }}>
+                <span>{name_nm[2]}</span>
+              </td>
+              <td style={{ width: "30%", paddingLeft: "2px" }}>
+                {dtl_info[2]}
+              </td>
+              <td align="right" style={{ width: "20%" }}>
+                {}
+              </td>
+              <td align="right" style={{ width: "20%" }}>
+                {weight[2]}
               </td>
             </tr>
           </tbody>
@@ -247,33 +264,31 @@ class Menu2 extends PureComponent {
 
     return (
       <div>
-        <Menu2Search parentState={this.loadItem} />
+        <Menu6Search parentState={this.loadItem} />
         <div className={classes.root}>
-          <div>
-            <div className={classes.header}>
-              <Grid className={classes.container} container>
-                <Grid item xs={4} sm={4}>
-                  <Paper elevation={0} className={classes.typo_header}>
-                    {"품명"}
-                  </Paper>
-                </Grid>
-                <Grid item xs={4} sm={4}>
-                  <Paper elevation={0} className={classes.typo_header}>
-                    {"수요가"}
-                  </Paper>
-                </Grid>
-                <Grid item xs={2} sm={2}>
-                  <Paper elevation={0} className={classes.typoLeft_header}>
-                    {"중량"}
-                  </Paper>
-                </Grid>
-                <Grid item xs={2} sm={2}>
-                  <Paper elevation={0} className={classes.typoRight_header}>
-                    {"상태"}
-                  </Paper>
-                </Grid>
+          <div className={classes.header}>
+            <Grid className={classes.container} container>
+              <Grid item xs={4} sm={4}>
+                <Paper elevation={0} className={classes.typo_header}>
+                  {"매출일"}
+                </Paper>
               </Grid>
-            </div>
+              <Grid item xs={4} sm={4}>
+                <Paper elevation={0} className={classes.typo_header}>
+                  {"수요가"}
+                </Paper>
+              </Grid>
+              <Grid item xs={2} sm={2}>
+                <Paper elevation={0} className={classes.typoLeft_header}>
+                  {"중량"}
+                </Paper>
+              </Grid>
+              <Grid item xs={2} sm={2}>
+                <Paper elevation={0} className={classes.typoRight_header}>
+                  {"금액"}
+                </Paper>
+              </Grid>
+            </Grid>
           </div>
           {this.state.loading === true ? (
             <div className={classes.circular_progress}>
@@ -299,25 +314,25 @@ class Menu2 extends PureComponent {
                           }}
                         >
                           <tbody>
-                            <td className={classes.td} style={{ width: "30%" }}>
-                              <b>{item.REQUEST_DATE}</b>
+                            <td className={classes.td} style={{ width: "25%" }}>
+                              <b>{item.SHIP_DATE}</b>
                             </td>
-                            <td className={classes.td} style={{ width: "40%" }}>
+                            <td className={classes.td} style={{ width: "30%" }}>
                               {item.SELL_CUST_NM}
                             </td>
                             <td
                               align="right"
                               className={classes.td}
-                              style={{ width: "15%" }}
+                              style={{ width: "23%" }}
                             >
                               {item.TOT_WEIGHT}
                             </td>
                             <td
                               align="right"
                               className={classes.td}
-                              style={{ width: "15%" }}
+                              style={{ width: "22%" }}
                             >
-                              {item.SHIP_STATUS}
+                              {item.TOT_AMOUNT}
                             </td>
                           </tbody>
                         </table>
@@ -328,73 +343,29 @@ class Menu2 extends PureComponent {
                           padding: "10px 0px",
                           borderBottom: "0.5px solid rgba(0 ,0, 0, .4)",
                           tableLayout: "fixed",
-                          background: "#F5F5F5",
-                          fontSize: "13px",
-                        }}
-                      >
-                        <tbody>
-                          <tr>
-                            <td align="left" style={{ paddingLeft: "10px" }}>
-                              출고요청번호 :{" "}
-                              <span style={{ color: "#3C6B81" }}>
-                                {" "}
-                                <b>{item.REQUEST_NO}</b>
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td align="left" style={{ paddingLeft: "10px" }}>
-                              사급업체 :{" "}
-                              <span style={{ color: "#3C6B81" }}>
-                                {" "}
-                                <b>{item.VEN_CUST_NM}</b>
-                              </span>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td align="left" style={{ paddingLeft: "10px" }}>
-                              착　　지 :
-                              <span style={{ color: "#3C6B81" }}>
-                                {" "}
-                                <b>{item.DLV_CUST_NM}</b>
-                              </span>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-
-                      <table
-                        style={{
-                          width: "100%",
-                          padding: "10px 0px",
-                          borderBottom: "0.5px solid rgba(0 ,0, 0, .4)",
-                          tableLayout: "fixed",
                           background: "#E4E4E4",
-                          fontSize: "13px",
+                          fontSize: "11px",
                         }}
                       >
                         <tbody>
                           <tr>
                             <td
                               align="left"
-                              style={{ paddingLeft: "5px", width: "30%" }}
+                              style={{ width: "25%", paddingLeft: "2px" }}
                             >
                               품명/재질/사업장
                             </td>
                             <td
                               align="left"
-                              style={{ paddingLeft: "5px", width: "30%" }}
+                              style={{ width: "25%", paddingLeft: "2px" }}
                             >
                               SIZE/제품번호
                             </td>
-                            <td align="right" style={{ width: "20%" }}>
-                              수량/라인
+                            <td align="right" style={{ width: "25%" }}>
+                              착지/수량
                             </td>
-                            <td
-                              align="right"
-                              style={{ width: "20%", paddingRight: "5px" }}
-                            >
-                              중량/상태
+                            <td align="right" style={{ width: "25%" }}>
+                              중량/금액/단가
                             </td>
                           </tr>
                         </tbody>
@@ -412,29 +383,32 @@ class Menu2 extends PureComponent {
               }
             })
           )}
-          {this.state.loading !== true &&
-            this.state.itemList.TOTAL_WEIGHT !== undefined && (
-              <div className={classes.footer}>
-                <Grid className={classes.container} container>
-                  <Grid item xs={6} sm={6}>
-                    <Paper elevation={0} className={classes.typo_footer}>
-                      {"합계"}
-                    </Paper>
-                  </Grid>
-                  <Grid item xs={6} sm={6}>
-                    <Paper elevation={0} className={classes.typoRight_footer}>
-                      {numberWithCommas(
-                        String(this.state.itemList.TOTAL_WEIGHT)
-                      )}
-                    </Paper>
-                  </Grid>
-                </Grid>
-              </div>
-            )}
         </div>
+        {this.state.loading !== true &&
+          this.state.itemList.TOTAL_WEIGHT !== undefined && (
+            <div className={classes.footer}>
+              <Grid className={classes.container} container>
+                <Grid item xs={3} sm={3}>
+                  <Paper elevation={0} className={classes.typo_footer}>
+                    {"합계"}
+                  </Paper>
+                </Grid>
+                <Grid item xs={4} sm={4}>
+                  <Paper elevation={0} className={classes.typoLeft_footer}>
+                    {numberWithCommas(String(this.state.itemList.TOTAL_WEIGHT))}
+                  </Paper>
+                </Grid>
+                <Grid item xs={5} sm={5}>
+                  <Paper elevation={0} className={classes.typoRight_footer}>
+                    {numberWithCommas(String(this.state.itemList.TOTAL_AMOUNT))}
+                  </Paper>
+                </Grid>
+              </Grid>
+            </div>
+          )}
       </div>
     );
   }
 }
 
-export default withStyles(useStyles)(Menu2);
+export default withStyles(useStyles)(Menu6);

@@ -8,7 +8,6 @@ import IconButton from "@material-ui/core/IconButton";
 import ClearIcon from "@material-ui/icons/Clear";
 import { withStyles } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/core/styles";
-import CustomAlertDialog from "../../components/CusomAlertDialog";
 import CustomDialogOnlySelect from "../../components/CustomDialogOnlySelect";
 import CustomDialogMultiSelect from "../../components/CustomDialogMultiSelect";
 import Drawer from "@material-ui/core/Drawer";
@@ -117,7 +116,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Menu1_Search({ parentState }) {
+function Menu6_Search({ parentState }) {
   const classes = useStyles();
 
   window.addEventListener("checkBackFlag", funCheckDialogFlag, {
@@ -126,18 +125,13 @@ function Menu1_Search({ parentState }) {
 
   function funCheckDialogFlag() {
     let count = 0;
-
     if (count === 0) {
       if (openDialogSearch) {
         setOpenDialogSearch(false);
         console.log("dialog");
         count = count + 1;
       }
-      if (openAlertDialog) {
-        setOpenAlertDialog(false);
-        console.log("alertDialog");
-        count = count + 1;
-      }
+
       if (openDialogOnlySelect) {
         setOpenDialogOnlySelect(false);
         console.log("onlySelectDialog");
@@ -158,7 +152,6 @@ function Menu1_Search({ parentState }) {
 
   function funCheckSearchFlag() {
     let count = 0;
-
     if (openSearch) {
       setOpenSearch(!openSearch);
       count = 2;
@@ -210,7 +203,6 @@ function Menu1_Search({ parentState }) {
   const [openDialogSearch, setOpenDialogSearch] = useState(false);
   const [openDialogOnlySelect, setOpenDialogOnlySelect] = useState(false);
   const [openDialogMultiSelect, setOpenDialogMultiSelect] = useState(false);
-  const [openAlertDialog, setOpenAlertDialog] = React.useState(false);
   const handleOnChange = (e) => {
     const { value, name } = e.target;
     setInputs({
@@ -385,19 +377,6 @@ function Menu1_Search({ parentState }) {
     setOpenDialogMultiSelect(false);
   };
 
-  const handleClickAgree = () => {
-    setOpenAlertDialog(false);
-    closeProgram();
-  };
-
-  const handleClickDisagree = () => {
-    setOpenAlertDialog(false);
-  };
-
-  const closeProgram = () => {
-    window.sessionStorage.setItem("closeFlag", 0);
-  };
-
   const setLoadItem = (item, isSort) => {
     parentState(item, isSort); // 조회시 state 넘기는 역할
   };
@@ -409,7 +388,6 @@ function Menu1_Search({ parentState }) {
         className={classes.searchIcon}
         onClick={() => setOpenSearch(!openSearch)}
       />
-      {console.log("searchrender")}
       <Drawer open={openSearch} anchor={"right"} variant="persistent">
         <div className={classes.grow}>
           <Container className={classes.root}>
@@ -733,25 +711,17 @@ function Menu1_Search({ parentState }) {
             open={openDialogMultiSelect}
             onClose={handleCloseMultiSelect}
           />
-
-          <CustomAlertDialog
-            open={openAlertDialog}
-            handleClickAgree={() => handleClickAgree()}
-            handleClickDisagree={() => handleClickDisagree()}
-            title={"프로그램 종료"}
-            content={"소재재고현황 종료하시겠습니까?"}
-          />
         </div>
       </Drawer>
     </div>
   );
 }
 
-Menu1_Search.propTypes = {
+Menu6_Search.propTypes = {
   history: PropTypes.object,
   programName: PropTypes.string,
   parentState: PropTypes.func,
   openSearchToggle: PropTypes.bool,
 };
 
-export default React.memo(Menu1_Search);
+export default React.memo(Menu6_Search);

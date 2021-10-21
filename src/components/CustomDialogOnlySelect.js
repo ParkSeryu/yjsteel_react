@@ -60,7 +60,9 @@ function CustomDialogOnlySelect(props) {
         >
           <ClearIcon />
         </IconButton>
-        <DialogContent>
+        <DialogContent
+          style={{ padding: 0, marign: 0, minWidth: "300px", height: "100%" }}
+        >
           <div>
             {data.map((listData) => (
               <div key={listData.CODE_CD}>

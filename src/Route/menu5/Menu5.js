@@ -4,7 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import imgA from "../../images/loading.gif";
-import Menu1Search from "./Menu1_Search";
+import Menu5Search from "./Menu5_Search";
 
 const numberWithCommas = (x) => {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -116,7 +116,7 @@ const nullCheckZero = (text) => {
   else return text;
 };
 
-class Menu1 extends PureComponent {
+class Menu5 extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -241,12 +241,13 @@ class Menu1 extends PureComponent {
     let coil_seq = strArray[2];
     console.log(work_cust_cd + "  " + coil_no + "  " + coil_seq);
     document.getElementById("detail_loading_circle").style.display = "block";
+
     const instance = axios.create({
       timeout: 3000,
     });
 
     instance
-      .get("http://121.165.242.72:5050/m_api/index.php/Menu1/detail", {
+      .get("http://121.165.242.72:5050/m_api/index.php/Menu5/detail", {
         params: {
           work_cust_cd: work_cust_cd,
           coil_no: coil_no,
@@ -255,8 +256,7 @@ class Menu1 extends PureComponent {
       })
       .then((response) => {
         console.log(response.data.DATA);
-
-        document.getElementById("detailTitle").textContent = "소재재고현황";
+        document.getElementById("detailTitle").textContent = "제품재고현황";
         document.getElementById("work_cust_nm").textContent = nullCheck(
           response.data.DATA.WORK_CUST_NM
         );
@@ -362,7 +362,7 @@ class Menu1 extends PureComponent {
     });
 
     axios
-      .get("http://121.165.242.72:5050/m_api/index.php/Menu1/retrieve", {
+      .get("http://121.165.242.72:5050/m_api/index.php/Menu5/retrieve", {
         params: {
           im_cls: data.im_cls,
           name_cd: data.name_cd,
@@ -414,175 +414,183 @@ class Menu1 extends PureComponent {
 
     return (
       <div>
-        <Menu1Search parentState={this.loadItem} />
-        <div className={classes.header}>
-          <Grid className={classes.container} container>
-            <Grid item xs={4} sm={4}>
-              <Paper elevation={0} className={classes.typo_header}>
-                {"품명"}
-              </Paper>
-            </Grid>
-            <Grid item xs={4} sm={4}>
-              <Paper elevation={0} className={classes.typo_header}>
-                {"사이즈"}
-              </Paper>
-            </Grid>
-            <Grid item xs={2} sm={2}>
-              <Paper elevation={0} className={classes.typoLeft_header}>
-                {"수량"}
-              </Paper>
-            </Grid>
-            <Grid item xs={2} sm={2}>
-              <Paper elevation={0} className={classes.typoRight_header}>
-                {"중량"}
-              </Paper>
-            </Grid>
-          </Grid>
-        </div>
+        <Menu5Search parentState={this.loadItem} />
         <div className={classes.root}>
-          {this.state.loading === true ? (
-            <div className={classes.circular_progress}>
-              <img src={imgA} width="50px" height="50px" alt="loading..." />
-            </div>
-          ) : (
-            this.state.itemList.length !== 0 &&
-            this.state.itemList.DATA.map((item, index) => {
-              if (item.SORT_VAL === "1") {
-                return (
-                  <div key={index}>
-                    <details>
-                      <summary>
+          <div className={classes.header}>
+            <Grid className={classes.container} container>
+              <Grid item xs={4} sm={4}>
+                <Paper elevation={0} className={classes.typo_header}>
+                  {"품명"}
+                </Paper>
+              </Grid>
+              <Grid item xs={4} sm={4}>
+                <Paper elevation={0} className={classes.typo_header}>
+                  {"사이즈"}
+                </Paper>
+              </Grid>
+              <Grid item xs={2} sm={2}>
+                <Paper elevation={0} className={classes.typoLeft_header}>
+                  {"수량"}
+                </Paper>
+              </Grid>
+              <Grid item xs={2} sm={2}>
+                <Paper elevation={0} className={classes.typoRight_header}>
+                  {"중량"}
+                </Paper>
+              </Grid>
+            </Grid>
+          </div>
+          <div className={classes.root}>
+            {this.state.loading === true ? (
+              <div className={classes.circular_progress}>
+                <img src={imgA} width="50px" height="50px" alt="loading..." />
+              </div>
+            ) : (
+              this.state.itemList.length !== 0 &&
+              this.state.itemList.DATA.map((item, index) => {
+                if (item.SORT_VAL === "1") {
+                  return (
+                    <div key={index}>
+                      <details>
+                        <summary>
+                          <table
+                            style={{
+                              width: "100%",
+                              padding: "10px 1vw",
+                              borderBottom: "0.5px solid rgba(0 ,0, 0, .4)",
+                              overflowX: "clip",
+                              tableLayout: "fixed",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            <tbody>
+                              <td
+                                className={classes.td}
+                                style={{ width: "30%" }}
+                              >
+                                <b>{item.NAME_NM}</b>
+                              </td>
+                              <td
+                                className={classes.td}
+                                style={{ width: "35%" }}
+                              >
+                                {item.SIZE_VAL}
+                              </td>
+                              <td
+                                align="right"
+                                className={classes.td}
+                                style={{ width: "13%" }}
+                              >
+                                {item.STOCK_QUANTITY}
+                              </td>
+                              <td
+                                align="right"
+                                className={classes.td}
+                                style={{ width: "22%" }}
+                              >
+                                {item.STOCK_WEIGHT}
+                              </td>
+                            </tbody>
+                          </table>
+                        </summary>
                         <table
                           style={{
                             width: "100%",
-                            padding: "10px 1vw",
+                            padding: "10px 0px",
                             borderBottom: "0.5px solid rgba(0 ,0, 0, .4)",
-                            overflowX: "clip",
                             tableLayout: "fixed",
-                            whiteSpace: "nowrap",
+                            background: "#E4E4E4",
+                            fontSize: "13px",
                           }}
                         >
                           <tbody>
-                            <td className={classes.td} style={{ width: "30%" }}>
-                              <b>{item.NAME_NM}</b>
-                            </td>
-                            <td className={classes.td} style={{ width: "35%" }}>
-                              {item.SIZE_VAL}
-                            </td>
-                            <td
-                              align="right"
-                              className={classes.td}
-                              style={{ width: "13%" }}
-                            >
-                              {item.STOCK_QUANTITY}
-                            </td>
-                            <td
-                              align="right"
-                              className={classes.td}
-                              style={{ width: "22%" }}
-                            >
-                              {item.STOCK_WEIGHT}
-                            </td>
+                            <tr>
+                              <td
+                                align="center"
+                                style={{ width: "20%", left: "15px" }}
+                              >
+                                재질
+                              </td>
+                              <td align="center" style={{ width: "14%" }}>
+                                도유
+                              </td>
+                              <td style={{ width: "14%" }}>후처리</td>
+                              <td style={{ width: "10%" }}>YP</td>
+                              <td style={{ width: "10%" }}>TS</td>
+                              <td style={{ width: "10%" }}>EL</td>
+                              <td align="center" style={{ width: "12%" }}>
+                                수량
+                              </td>
+                              <td
+                                align="right"
+                                style={{ width: "16%", paddingRight: "5px" }}
+                              >
+                                중량
+                              </td>
+                            </tr>
+                            <tr>
+                              <td align="center" style={{ width: "20%" }}>
+                                사업장
+                              </td>
+                              <td style={{ width: "14%" }}></td>
+                              <td style={{ width: "14%" }}></td>
+                              <td style={{ width: "10%" }}>C</td>
+                              <td style={{ width: "10%" }}>Si</td>
+                              <td style={{ width: "10%" }}>Mn</td>
+                              <td align="center" style={{ width: "12%" }}></td>
+                              <td
+                                align="right"
+                                style={{ width: "16%", paddingRight: "5px" }}
+                              >
+                                매입단가
+                              </td>
+                            </tr>
                           </tbody>
                         </table>
-                      </summary>
-                      <table
-                        style={{
-                          width: "100%",
-                          padding: "10px 0px",
-                          borderBottom: "0.5px solid rgba(0 ,0, 0, .4)",
-                          tableLayout: "fixed",
-                          background: "#E4E4E4",
-                          fontSize: "13px",
-                        }}
-                      >
-                        <tbody>
-                          <tr>
-                            <td
-                              align="center"
-                              style={{ width: "20%", left: "15px" }}
-                            >
-                              재질
-                            </td>
-                            <td align="center" style={{ width: "14%" }}>
-                              도유
-                            </td>
-                            <td style={{ width: "14%" }}>후처리</td>
-                            <td style={{ width: "10%" }}>YP</td>
-                            <td style={{ width: "10%" }}>TS</td>
-                            <td style={{ width: "10%" }}>EL</td>
-                            <td align="center" style={{ width: "12%" }}>
-                              수량
-                            </td>
-                            <td
-                              align="right"
-                              style={{ width: "16%", paddingRight: "5px" }}
-                            >
-                              중량
-                            </td>
-                          </tr>
-                        </tbody>
-                        <tbody>
-                          <tr>
-                            <td align="center" style={{ width: "20%" }}>
-                              사업장
-                            </td>
-                            <td style={{ width: "14%" }}></td>
-                            <td style={{ width: "14%" }}></td>
-                            <td style={{ width: "10%" }}>C</td>
-                            <td style={{ width: "10%" }}>Si</td>
-                            <td style={{ width: "10%" }}>Mn</td>
-                            <td align="center" style={{ width: "12%" }}></td>
-                            <td
-                              align="right"
-                              style={{ width: "16%", paddingRight: "5px" }}
-                            >
-                              매입단가
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
 
-                      {this.renderList(
-                        index + 1,
-                        this.state.itemList,
-                        this.state.itemList.DATA.length,
-                        classes
+                        {this.renderList(
+                          index + 1,
+                          this.state.itemList,
+                          this.state.itemList.DATA.length,
+                          classes
+                        )}
+                      </details>
+                    </div>
+                  );
+                }
+              })
+            )}
+          </div>
+          {this.state.loading !== true &&
+            this.state.itemList.TOTAL_WEIGHT !== undefined && (
+              <div className={classes.footer}>
+                <Grid className={classes.container} container>
+                  <Grid item xs={6} sm={6}>
+                    <Paper elevation={0} className={classes.typo_footer}>
+                      {"합계"}
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={3} sm={3}>
+                    <Paper elevation={0} className={classes.typoLeft_footer}>
+                      {numberWithCommas(
+                        String(this.state.itemList.TOTAL_QUANTITY)
                       )}
-                    </details>
-                  </div>
-                );
-              }
-            })
-          )}
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={3} sm={3}>
+                    <Paper elevation={0} className={classes.typoRight_footer}>
+                      {numberWithCommas(
+                        String(this.state.itemList.TOTAL_WEIGHT)
+                      )}
+                    </Paper>
+                  </Grid>
+                </Grid>
+              </div>
+            )}
         </div>
-        {this.state.loading !== true &&
-          this.state.itemList.TOTAL_WEIGHT !== undefined && (
-            <div className={classes.footer}>
-              <Grid className={classes.container} container>
-                <Grid item xs={6} sm={6}>
-                  <Paper elevation={0} className={classes.typo_footer}>
-                    {"합계"}
-                  </Paper>
-                </Grid>
-                <Grid item xs={3} sm={3}>
-                  <Paper elevation={0} className={classes.typoLeft_footer}>
-                    {numberWithCommas(
-                      String(this.state.itemList.TOTAL_QUANTITY)
-                    )}
-                  </Paper>
-                </Grid>
-                <Grid item xs={3} sm={3}>
-                  <Paper elevation={0} className={classes.typoRight_footer}>
-                    {numberWithCommas(String(this.state.itemList.TOTAL_WEIGHT))}
-                  </Paper>
-                </Grid>
-              </Grid>
-            </div>
-          )}
       </div>
     );
   }
 }
 
-export default withStyles(useStyles)(Menu1);
+export default withStyles(useStyles)(Menu5);

@@ -145,9 +145,9 @@ function CustomDialogMultiSelect(props) {
             }}
           />
         </DialogTitle>
-        <DialogContent dividers className={"customDialog"}>
+        <DialogContent dividers style={{ height: "60vh" }}>
           <div>
-            {filteredList.length > 0 ? (
+            {filteredList.length > 0 &&
               filteredList.map((listData) => (
                 <div key={listData.CODE_CD}>
                   <ListItem
@@ -173,16 +173,7 @@ function CustomDialogMultiSelect(props) {
                   </ListItem>
                   {listData.CODE_CD !== "MG" && <Divider />}
                 </div>
-              ))
-            ) : (
-              <div>
-                {codeListData.map((listData, index) => (
-                  <ListItem key={index}>
-                    <ListItemText />
-                  </ListItem>
-                ))}
-              </div>
-            )}
+              ))}
           </div>
         </DialogContent>
         <DialogActions>
